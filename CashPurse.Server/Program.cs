@@ -2,6 +2,7 @@ using CashPurse.Server.Data;
 using CashPurse.Server.Endpoints;
 using CashPurse.Server.Models;
 using dotenv.net;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 DotEnv.Load();
@@ -13,6 +14,8 @@ builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<CashPurseDbContext>();

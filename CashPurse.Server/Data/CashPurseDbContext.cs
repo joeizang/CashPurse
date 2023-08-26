@@ -39,6 +39,15 @@ public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
             .WithOne()
             .HasForeignKey(x => x.ExpenseEntityId)
             .IsRequired(false);
+
+        builder.Entity<Expense>()
+            .HasIndex(e => e.ExpenseDate);
+        builder.Entity<Expense>()
+            .HasIndex(e => e.Amount);
+        builder.Entity<BudgetList>()
+            .HasIndex(b => b.CreatedAt);
+
+
         base.OnModelCreating(builder);
     }
 }

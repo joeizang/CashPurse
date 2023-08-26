@@ -122,6 +122,20 @@ namespace CashPurse.Server.CompiledEFQueries
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
                 );
 
+        public static readonly Func<CashPurseDbContext, DateTimeOffset, string, IAsyncEnumerable<BudgetListModel>>
+            GetCursorPagedUserBudgetLists =
+                EF.CompileAsyncQuery(
+                    (CashPurseDbContext context, DateTimeOffset cursor, string userId) =>
+                        context.BudgetLists.AsNoTracking()
+                            .OrderBy(b => b.CreatedAt)
+                            .Where(b => b.Expense.ExpenseOwnerId == userId)
+                            .Where(b => b.CreatedAt == cursor)
+                            .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
+                                b.Expense.ExpenseOwnerId,
+                                b.BudgetItems.Select(x => new BudgetListItemModel(
+                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                );
+
         public static readonly Func<CashPurseDbContext, string, Guid, IEnumerable<BudgetList>>
             GetUserBudgetListsForCount =
                 EF.CompileQuery(
