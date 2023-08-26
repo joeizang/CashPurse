@@ -3,29 +3,25 @@ using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
-public class ExpenseDataService : IExpenseDataService
+public static class ExpenseDataService
 {
-    private readonly CashPurseDbContext _context;
 
-    public ExpenseDataService(CashPurseDbContext context)
-    {
-        _context = context;
-    }
+    public static int TotalExpenses { get; set; }
 
-    public int TotalExpenses { get; set; }
-
-    public int TotalCount(string userId)
+    public static int TotalCount([FromServices] CashPurseDbContext _context, string userId)
     {
         return CompiledQueries.GetNnumberOfUserExpensesAsync(_context, userId);
     }
 
-    public async Task<PagedResult<ExpenseIndexModel>> GetUserExpenses(string userId, int pageNumber = 1)
+    public static async Task<PagedResult<ExpenseIndexModel>> GetUserExpenses([FromServices] CashPurseDbContext _context,
+        string userId, int pageNumber = 1)
     {
         var expenses = new List<ExpenseIndexModel>();
-        TotalExpenses = TotalCount(userId);
+        TotalExpenses = TotalCount(_context, userId);
         await foreach (var each in CompiledQueries.GetUserExpensesAsync(_context, userId))
         {
             expenses.Add(each);
@@ -35,11 +31,11 @@ public class ExpenseDataService : IExpenseDataService
                 (int)Math.Ceiling(TotalExpenses / (double)7), 7, pageNumber < (int)Math.Ceiling(TotalExpenses / (double)7), pageNumber > 1);
     }
 
-    public async Task<CursorPagedResult<List<ExpenseIndexModel>>> GetUserExpensesCursorPaged(string userId,
-        DateTimeOffset cursor)
+    public static async Task<CursorPagedResult<List<ExpenseIndexModel>>> GetCursorPagedUserExpenses([FromServices] CashPurseDbContext _context,
+        string userId, DateTimeOffset cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
-        await foreach (var each in CompiledQueries.GetUserExpensesCursorPagedAsync(_context, userId, cursor))
+        await foreach (var each in CompiledQueries.GetCursorPagedUserExpensesAsync(_context, userId, cursor))
         {
             expenses.Add(each);
         }
@@ -47,11 +43,12 @@ public class ExpenseDataService : IExpenseDataService
         return new CursorPagedResult<List<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
 
-    public async Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses(string userId, int pageNumber)
+    public static async Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses([FromServices] CashPurseDbContext _context,
+        string userId, int pageNumber)
     {
         var expenses = new List<ExpenseIndexModel>();
-        TotalExpenses = TotalCount(userId);
-        await foreach (var each in CompiledQueries.GetUserExpensesFilteredByExpenseTypeAsync(_context, pageNumber, userId))
+        TotalExpenses = TotalCount(_context, userId);
+        await foreach (var each in CompiledQueries.GetExpensesFilteredByExpenseTypeAsync(_context, pageNumber, userId))
         {
             expenses.Add(each);
         }
@@ -59,11 +56,23 @@ public class ExpenseDataService : IExpenseDataService
                 (int)Math.Ceiling(TotalExpenses / (double)7), 7, pageNumber < (int)Math.Ceiling(TotalExpenses / (double)7), pageNumber > 1);
     }
 
-    public async Task<PagedResult<ExpenseIndexModel>> GetCurrencyUsedFilteredExpenses(string userId, int pageNumber)
+    public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCursorPagedTypeFilteredExpenses([FromServices] CashPurseDbContext _context,
+        string userId, DateTimeOffset cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
-        TotalExpenses = TotalCount(userId);
-        await foreach (var each in CompiledQueries.GetUserExpensesFilteredByCurrencUsedAsync(_context, pageNumber, userId))
+        TotalExpenses = TotalCount(_context, userId);
+        await foreach (var each in CompiledQueries.GetCursorPagedExpensesFilteredByExpenseTypeAsync(_context, cursor, userId))
+        {
+            expenses.Add(each);
+        }
+        return new CursorPagedResult<IEnumerable<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
+    }
+
+    public static async Task<PagedResult<ExpenseIndexModel>> GetCurrencyUsedFilteredExpenses([FromServices] CashPurseDbContext _context, string userId, int pageNumber)
+    {
+        var expenses = new List<ExpenseIndexModel>();
+        TotalExpenses = TotalCount(_context, userId);
+        await foreach (var each in CompiledQueries.GetUserExpensesFilteredByCurrencyUsedAsync(_context, pageNumber, userId))
         {
             expenses.Add(each);
         }
@@ -71,7 +80,19 @@ public class ExpenseDataService : IExpenseDataService
                 (int)Math.Ceiling(TotalExpenses / (double)7), 7, pageNumber < (int)Math.Ceiling(TotalExpenses / (double)7), pageNumber > 1);
     }
 
-    public decimal GetExpenseTotalForLastMonth(string userId)
+    public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCurrencyUsedCursorPagedFilteredExpenses([FromServices] CashPurseDbContext _context, 
+        string userId, DateTimeOffset cursor)
+    {
+        var expenses = new List<ExpenseIndexModel>();
+        TotalExpenses = TotalCount(_context, userId);
+        await foreach (var each in CompiledQueries.GetCursorPagedUserExpensesFilteredByCurrencyUsedAsync(_context, cursor, userId))
+        {
+            expenses.Add(each);
+        }
+        return new CursorPagedResult<IEnumerable<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
+    }
+
+    public static decimal GetExpenseTotalForLastMonth([FromServices] CashPurseDbContext _context, string userId)
     {
         var result = CompiledQueries.GetExpenseTotalForLast30DaysAsync(_context, userId);
         var actualTotal = 0m;
@@ -97,7 +118,7 @@ public class ExpenseDataService : IExpenseDataService
         return actualTotal;
     }
 
-    public async Task<decimal> GetMeanSpendByDays(string userId, int days)
+    public static async Task<decimal> GetMeanSpendByDays([FromServices] CashPurseDbContext _context, string userId, int days)
     {
         var result = 0m;
         var counter = 0;

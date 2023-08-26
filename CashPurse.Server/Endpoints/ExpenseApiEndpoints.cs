@@ -2,5 +2,11 @@
 
 public static class ExpenseApiEndpoints
 {
-    public static void MapExpenseEndpoints(this WebApplicationBuilder app)
+    public static RouteGroupBuilder MapExpenseEndpoints(this IEndpointRouteBuilder app)
+    {
+        var expenseGroup = app.MapGroup("/api/expenses");
+        var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
+
+        return expenseGroup;
+    }
 }
