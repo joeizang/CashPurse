@@ -1,12 +1,17 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using CashPurse.Server.BusinessLogic.EndpointHandlers;
+using CashPurse.Server.CompiledEFQueries;
 
 namespace CashPurse.Server.Endpoints;
 
 public static class ExpenseApiEndpoints
 {
-    public static void MapExpenseEndpoints(this IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapExpenseEndpoints(this IEndpointRouteBuilder app)
     {
-        var expensesEndpoints = app.MapGroup("/api/expenses");
-        
+        var expenseGroup = app.MapGroup("/api/expenses");
+        var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
+
+        expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet);
+
+        return expenseGroup;
     }
 }
