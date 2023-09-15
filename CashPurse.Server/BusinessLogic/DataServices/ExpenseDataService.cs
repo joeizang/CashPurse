@@ -105,9 +105,9 @@ public class ExpenseDataService : IExpenseDataService
         {
             var temp = item.CurrencyUsed switch
             {
-                Currency.USD => item.Amount * 750,
-                Currency.EUR => item.Amount * 900,
-                Currency.GBP => item.Amount * 1050,
+                Currency.USD => item.Amount * 799,
+                Currency.EUR => item.Amount * 1046,
+                Currency.GBP => item.Amount * 1222,
                 _ => item.Amount
             };
             result += temp;
