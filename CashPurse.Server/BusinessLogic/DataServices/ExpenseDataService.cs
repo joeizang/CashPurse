@@ -137,5 +137,14 @@ public interface IExpenseDataService
 
     Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses(string userId, int pageNumber);
 
+    Task<CursorPagedResult<List<ExpenseIndexModel>>> GetCursorPagedUserExpenses(CashPurseDbContext _context,
+        string userId, DateTimeOffset cursor);
+
+    Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCursorPagedTypeFilteredExpenses(CashPurseDbContext _context,
+        string userId, DateTimeOffset cursor);
+
+    Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCurrencyUsedCursorPagedFilteredExpenses(CashPurseDbContext _context, 
+        string userId, DateTimeOffset cursor);
+
     Task<decimal> GetMeanSpendByDays(string userId, int days);
 }
