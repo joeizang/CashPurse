@@ -97,22 +97,13 @@ public static class ExpenseDataService
         var actualTotal = 0m;
         foreach (var each in result)
         {
-            if (each.CurrencyUsed == Currency.USD)
+            actualTotal += each.CurrencyUsed switch
             {
-                actualTotal += each.Amount * 799;
-            }
-            else if (each.CurrencyUsed == Currency.EUR)
-            {
-                actualTotal += each.Amount * 1046;
-            }
-            else if (each.CurrencyUsed == Currency.GBP)
-            {
-                actualTotal += each.Amount * 1222;
-            }
-            else if (each.CurrencyUsed == Currency.NGN)
-            {
-                actualTotal += each.Amount;
-            }
+                Currency.USD => each.Amount * 799,
+                Currency.EUR => each.Amount * 1046,
+                Currency.GBP => each.Amount * 1222,
+                _ => each.Amount
+            };
         }
         return actualTotal;
     }
