@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+.idea/.idea.CashPurse/.idea/encodings.xml
+.idea/.idea.CashPurse/.idea/indexLayout.xml
+.idea/.idea.CashPurse/.idea/vcs.xml
+.vscode/settings.json

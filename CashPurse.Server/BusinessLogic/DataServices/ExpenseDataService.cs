@@ -8,7 +8,6 @@ namespace CashPurse.Server.BusinessLogic.DataServices;
 
 public static class ExpenseDataService
 {
-
     public static int TotalExpenses { get; set; }
 
     public static int TotalCount(CashPurseDbContext _context, string userId)

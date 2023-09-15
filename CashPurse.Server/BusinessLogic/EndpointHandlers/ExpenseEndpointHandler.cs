@@ -16,11 +16,8 @@ public static class ExpenseEndpointHandler
     public static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleGet(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager)
     {
-        var userId = principal.Identity.Name!;
-
+        var userId = principal?.Identity?.Name!;
         var user = await userManager.FindByNameAsync(userId).ConfigureAwait(false);
-
-
         //if(request.Value == DateTimeOffset.MinValue || request is null)
         //{
         //    var result = await ExpenseDataService.GetUserExpenses(context, user!.Id).ConfigureAwait(false);
