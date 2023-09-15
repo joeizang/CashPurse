@@ -99,15 +99,15 @@ public static class ExpenseDataService
         {
             if (each.CurrencyUsed == Currency.USD)
             {
-                actualTotal += each.Amount * 750;
+                actualTotal += each.Amount * 799;
             }
             else if (each.CurrencyUsed == Currency.EUR)
             {
-                actualTotal += each.Amount * 900;
+                actualTotal += each.Amount * 1046;
             }
             else if (each.CurrencyUsed == Currency.GBP)
             {
-                actualTotal += each.Amount * 1050;
+                actualTotal += each.Amount * 1222;
             }
             else if (each.CurrencyUsed == Currency.NGN)
             {
