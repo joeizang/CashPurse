@@ -15,6 +15,16 @@ namespace CashPurse.Server.CompiledEFQueries
                    context.Expenses
                        .AsNoTracking().Count(e => e.ExpenseOwner.Id == userId));
 
+        public static readonly Func<CashPurseDbContext, string, Guid, ExpenseIndexModel>
+            GetExpenseById =
+                EF.CompileQuery((CashPurseDbContext context, string userId, Guid expenseId) => 
+                        context.Expenses.AsNoTracking()
+                        .Where(e => e.Id.Equals(expenseId))
+                        .Where(e => e.ExpenseOwnerId.Equals(userId))
+                        .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
+                                e.CurrencyUsed, e.ExpenseType, e.Notes!))
+                        .Single());
+
 
         public static readonly Func<CashPurseDbContext, string, IAsyncEnumerable<ExpenseIndexModel>>
             GetUserExpensesAsync =

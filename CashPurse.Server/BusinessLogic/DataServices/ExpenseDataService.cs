@@ -42,6 +42,12 @@ public static class ExpenseDataService
         return new CursorPagedResult<List<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
 
+    public static ExpenseIndexModel GetUserExpenseById(CashPurseDbContext _context, string userId, Guid expenseId)
+    {
+        var result = CompiledQueries.GetExpenseById(_context, userId, expenseId);
+        return result;
+    }
+
     public static async Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses(CashPurseDbContext _context,
         string userId, int pageNumber)
     {
