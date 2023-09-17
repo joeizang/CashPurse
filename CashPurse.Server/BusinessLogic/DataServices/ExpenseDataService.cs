@@ -3,11 +3,39 @@ using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
 public static class ExpenseDataService
 {
+
+    public static async Task AddNewExpense(CashPurseDbContext _context, Expense entity)
+    {
+        _context.Expenses.Add(entity);
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    public static async Task<bool> UpdateExpense(CashPurseDbContext _context, Expense entity)
+    {
+        try
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public static async Task DeleteExpense(CashPurseDbContext _context, Expense entity)
+    {
+        _context.Entry(entity).State = EntityState.Modified;
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+    }
     public static int TotalExpenses { get; set; }
 
     public static int TotalCount(CashPurseDbContext _context, string userId)
