@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlite(builder.Configuration["sqliteconnectionstring"]!);
 });
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
