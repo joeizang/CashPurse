@@ -10,7 +10,7 @@ public static class ExpenseApiEndpoints
         var expenseGroup = app.MapGroup("/api/expenses");
         var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
 
-        expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet);
+        expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet).CacheOutput("CacheDataPage");
 
         return expenseGroup;
     }

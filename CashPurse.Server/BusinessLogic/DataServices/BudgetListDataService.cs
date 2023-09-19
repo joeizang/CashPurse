@@ -6,28 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
-public interface IBudgetListDataService
+public static class BudgetListDataService
 {
-    Task<IEnumerable<BudgetListModel>> GetUserBudgetLists(string userId);
 
-    Task AddNewBudgetList(BudgetList entity);
-    Task<bool> UpdateBudgetList(BudgetList entity);
-    Task DeleteBudgetList(BudgetList entity);
-}
-
-public class BudgetListDataService : IBudgetListDataService
-{
-    private readonly CashPurseDbContext _context;
-
-    public BudgetListDataService(CashPurseDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<IEnumerable<BudgetListModel>> GetUserBudgetLists(string userId)
+    public static async Task<List<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context, string userId, DateTimeOffset cursor)
     {
         var results = new List<BudgetListModel>();
-        await foreach (var budgetList in CompiledQueries.GetUserBudgetLists(_context, userId))
+        await foreach (var budgetList in CompiledQueries.GetCursorPagedUserBudgetLists(_context, cursor, userId))
         {
             results.Add(budgetList);
         }
@@ -35,7 +20,7 @@ public class BudgetListDataService : IBudgetListDataService
         return results;
     }
 
-    public int CountBudgetListItems(string userId, Guid id)
+    public static int CountBudgetListItems(CashPurseDbContext _context, string userId, Guid id)
     {
         var result = CompiledQueries
             .GetUserBudgetListsForCount(_context, userId, id)
@@ -43,13 +28,13 @@ public class BudgetListDataService : IBudgetListDataService
         return result;
     }
 
-    public async Task AddNewBudgetList(BudgetList entity)
+    public static async Task AddNewBudgetList(CashPurseDbContext _context,BudgetList entity)
     {
         _context.BudgetLists.Add(entity);
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public async Task<bool> UpdateBudgetList(BudgetList entity)
+    public static async Task<bool> UpdateBudgetList(CashPurseDbContext _context, BudgetList entity)
     {
         try
         {
@@ -64,7 +49,7 @@ public class BudgetListDataService : IBudgetListDataService
         }
     }
 
-    public async Task DeleteBudgetList(BudgetList entity)
+    public static async Task DeleteBudgetList(CashPurseDbContext _context, BudgetList entity)
     {
         _context.Entry(entity).State = EntityState.Modified;
         await _context.SaveChangesAsync().ConfigureAwait(false);

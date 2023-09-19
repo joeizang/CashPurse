@@ -12,7 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
-    options.UseSqlite("Data Source=cashpursedb.sqlite");
+    // options.UseSqlite("Data Source=cashpursedb.sqlite");
+    options.UseNpgsql(builder.Configuration["postgresconnectionstring"]);
+});
+builder.Services.AddOutputCache(options => {
+    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(12)));
+    options.AddPolicy("CacheDataPage", builder => builder.Expire(TimeSpan.FromSeconds(30)));
 });
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
@@ -27,6 +32,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseOutputCache();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -35,7 +41,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.MapGroup("/auth").MapIdentityApi<ApplicationUser>();
 
 app.MapExpenseEndpoints();

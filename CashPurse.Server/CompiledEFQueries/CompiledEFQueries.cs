@@ -127,9 +127,10 @@ namespace CashPurse.Server.CompiledEFQueries
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.Expense.ExpenseOwnerId == userId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.Expense.ExpenseOwnerId, 
+                                b.Expense.ExpenseOwnerId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                            .Take(7)
                 );
 
         public static readonly Func<CashPurseDbContext, DateTimeOffset, string, IAsyncEnumerable<BudgetListModel>>
@@ -139,11 +140,12 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.Expense.ExpenseOwnerId == userId)
-                            .Where(b => b.CreatedAt == cursor)
+                            .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.Expense.ExpenseOwnerId,
+                                b.Expense.ExpenseOwnerId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                            .Take(7)
                 );
 
         public static readonly Func<CashPurseDbContext, string, Guid, IEnumerable<BudgetList>>

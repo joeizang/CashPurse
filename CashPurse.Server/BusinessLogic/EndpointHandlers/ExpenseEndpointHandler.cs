@@ -14,12 +14,12 @@ public static class ExpenseEndpointHandler
 {
     public static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleGet(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        [FromRoute] CursorPagedRequest cursor = default!)
+        [AsParameters] CursorPagedRequest cursor = default!)
     {
         try
         {
             var userId = principal?.Identity?.Name!;
-            var user = await userManager.FindByNameAsync(userId).ConfigureAwait(false);
+            var user = await userManager.FindByEmailAsync(userId).ConfigureAwait(false);
             var alternative = await ExpenseDataService.GetCursorPagedUserExpenses(context, user!.Id, cursor.Cursor)
                 .ConfigureAwait(false);
             return TypedResults.Ok(alternative!);
@@ -48,7 +48,7 @@ public static class ExpenseEndpointHandler
     }
 
     public static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
-        [FromServices] UserManager<ApplicationUser> userManager, [FromRoute] CursorPagedRequest cursor = default!) // use ExpenseDate for cursor in query
+        [FromServices] UserManager<ApplicationUser> userManager, [FromQuery] CursorPagedRequest cursor = default!) // use ExpenseDate for cursor in query
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
         var result = await ExpenseDataService
@@ -59,7 +59,7 @@ public static class ExpenseEndpointHandler
 
     public static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpenseByExpenseType(
         ClaimsPrincipal principal, [FromServices] UserManager<ApplicationUser> userManager,
-        [FromServices] CashPurseDbContext context, [FromRoute] CursorPagedRequest cursor = default!)
+        [FromServices] CashPurseDbContext context, [FromQuery] CursorPagedRequest cursor = default!)
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait (false);
         var result = await ExpenseDataService.GetCursorPagedTypeFilteredExpenses(context, user?.Id!, cursor.Cursor)

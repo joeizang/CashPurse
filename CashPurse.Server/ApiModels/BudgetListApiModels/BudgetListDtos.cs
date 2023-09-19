@@ -1,11 +1,11 @@
 ﻿namespace CashPurse.Server.ApiModels.BudgetListApiModels;
 
 public record BudgetListItemModel(Guid ItemId, string Name, double Quantity, decimal Price, decimal UnitPrice, string Description);
-public record CreateBudgetListItemModel(string Name, double Quantity, decimal Price,
+public record CreateBudgetListItemModel(string ListName, double Quantity, decimal Price,
     decimal UnitPrice, string Description);
 
-public record BudgetListModel(Guid ListId, string Name, string Description, string OwnerId,
-    IEnumerable<BudgetListItemModel> Items);
+public record BudgetListModel(Guid ListId, string Name, string Description, string OwnerId, DateTimeOffset CreatedAt,
+    IEnumerable<BudgetListItemModel> BudgetItems);
 
 public record BudgetListIndexModel(Guid ListId, string Name, string Description, string OwnerId, int ItemCount,
     IEnumerable<BudgetListItemModel> Items);
