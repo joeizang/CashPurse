@@ -11,6 +11,13 @@ public static class ExpenseApiEndpoints
         var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
 
         expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet).CacheOutput("CacheDataPage");
+        expenseGroup.MapGet("/bycurrency", ExpenseEndpointHandler.HandleGetExpensesByCurrency).CacheOutput("CacheDataPage");
+        expenseGroup.MapGet("/bytype", ExpenseEndpointHandler.HandleGetExpenseByExpenseType).CacheOutput("CacheDataPage");
+        expenseGroupWithIds.MapGet("", ExpenseEndpointHandler.HandleGetById).CacheOutput("CacheDataPage");
+
+        expenseGroup.MapPost("", ExpenseEndpointHandler.HandleCreateExpense);
+        expenseGroupWithIds.MapPut("", ExpenseEndpointHandler.HandleUpdateExpense);
+        expenseGroupWithIds.MapDelete("", ExpenseEndpointHandler.HandleDeleteExpense);
 
         return expenseGroup;
     }
