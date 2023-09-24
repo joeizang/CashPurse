@@ -1,9 +1,11 @@
-﻿namespace CashPurse.Server.Models;
+﻿using NodaTime;
+
+namespace CashPurse.Server.Models;
 
 public class Expense : BaseEntity
 {
     public required string Name { get; set; }
-    public DateTimeOffset ExpenseDate { get; set; } = DateTimeOffset.Now;
+    public DateTime ExpenseDate { get; set; }
 
     public string Description { get; set; } = string.Empty;
 

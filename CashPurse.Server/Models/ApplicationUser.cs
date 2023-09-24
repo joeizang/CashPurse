@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using NodaTime;
 
 namespace CashPurse.Server.Models;
 
@@ -8,7 +9,13 @@ public class ApplicationUser : IdentityUser
     {
         Expenses = new List<Expense>();
         Incomes = new List<Income>();
+        CreatedAt = DateTime.UtcNow.ToLocalTime();
+        UpdatedAt = DateTime.UtcNow.ToLocalTime();
     }
+
+     public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
 
     public Currency PreferredCurrency { get; set; }
 

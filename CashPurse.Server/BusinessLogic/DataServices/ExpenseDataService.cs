@@ -4,6 +4,7 @@ using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
@@ -12,6 +13,7 @@ public static class ExpenseDataService
 
     public static async Task AddNewExpense(CashPurseDbContext _context, Expense entity)
     {
+        entity.ExpenseDate = entity.ExpenseDate;
         _context.Expenses.Add(entity);
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
@@ -20,6 +22,7 @@ public static class ExpenseDataService
     {
         try
         {
+            entity.ExpenseDate = entity.ExpenseDate;
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync().ConfigureAwait(false);
             return true;
@@ -33,6 +36,7 @@ public static class ExpenseDataService
 
     public static async Task DeleteExpense(CashPurseDbContext _context, Expense entity)
     {
+        entity.ExpenseDate = entity.ExpenseDate;
         _context.Entry(entity).State = EntityState.Modified;
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
@@ -58,7 +62,7 @@ public static class ExpenseDataService
     }
 
     public static async Task<CursorPagedResult<List<ExpenseIndexModel>>> GetCursorPagedUserExpenses(CashPurseDbContext _context,
-        string userId, DateTimeOffset cursor)
+        string userId, DateTime cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
         await foreach (var each in CompiledQueries.GetCursorPagedUserExpensesAsync(_context, userId, cursor))
@@ -66,7 +70,7 @@ public static class ExpenseDataService
             expenses.Add(each);
         }
 
-        if(expenses.Count == 0) return new CursorPagedResult<List<ExpenseIndexModel>>(DateTimeOffset.UtcNow, expenses);
+        if(expenses.Count == 0) return new CursorPagedResult<List<ExpenseIndexModel>>(DateTime.UtcNow.ToLocalTime(), expenses);
         return new CursorPagedResult<List<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
 
@@ -90,7 +94,7 @@ public static class ExpenseDataService
     }
 
     public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCursorPagedTypeFilteredExpenses(CashPurseDbContext _context,
-        string userId, DateTimeOffset cursor)
+        string userId, DateTime cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
         TotalExpenses = TotalCount(_context, userId);
@@ -114,7 +118,7 @@ public static class ExpenseDataService
     }
 
     public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCurrencyUsedCursorPagedFilteredExpenses(CashPurseDbContext _context, 
-        string userId, DateTimeOffset cursor)
+        string userId, DateTime cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
         TotalExpenses = TotalCount(_context, userId);
@@ -172,13 +176,13 @@ public interface IExpenseDataService
     Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses(string userId, int pageNumber);
 
     Task<CursorPagedResult<List<ExpenseIndexModel>>> GetCursorPagedUserExpenses(CashPurseDbContext _context,
-        string userId, DateTimeOffset cursor);
+        string userId, DateTime cursor);
 
     Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCursorPagedTypeFilteredExpenses(CashPurseDbContext _context,
-        string userId, DateTimeOffset cursor);
+        string userId, DateTime cursor);
 
     Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCurrencyUsedCursorPagedFilteredExpenses(CashPurseDbContext _context, 
-        string userId, DateTimeOffset cursor);
+        string userId, DateTime cursor);
 
     Task<decimal> GetMeanSpendByDays(string userId, int days);
 }

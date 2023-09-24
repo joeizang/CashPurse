@@ -25,6 +25,9 @@
     </PackageReference>
     <PackageReference Include="Npgsql" Version="8.0.0-preview.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-rc.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="7.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="7.0.11" />
+    <PackageReference Include="Npgsql.NodaTime" Version="7.0.6" />
     <PackageReference Include="Riok.Mapperly" Version="3.2.0" />
     <PackageReference Include="SendGrid" Version="9.28.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

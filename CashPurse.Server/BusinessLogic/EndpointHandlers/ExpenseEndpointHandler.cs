@@ -6,6 +6,7 @@ using CashPurse.Server.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 using System.Security.Claims;
 
 namespace CashPurse.Server.BusinessLogic.EndpointHandlers;
@@ -14,7 +15,7 @@ public static class ExpenseEndpointHandler
 {
     internal static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleGet(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        [AsParameters] CursorPagedRequest cursor = default!)
+        [AsParameters] CursorPagedRequest cursor)
     {
         try
         {
@@ -50,21 +51,21 @@ public static class ExpenseEndpointHandler
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpensesByCurrency(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context,
         [FromServices] UserManager<ApplicationUser> userManager,
-        [AsParameters] CursorPagedRequest? cursor) // use ExpenseDate for cursor in query
+        [AsParameters] CursorPagedRequest cursor) // use ExpenseDate for cursor in query
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
         var result = await ExpenseDataService
-            .GetCurrencyUsedCursorPagedFilteredExpenses(context, user?.Id!, cursor?.Cursor ?? DateTimeOffset.MinValue)
+            .GetCurrencyUsedCursorPagedFilteredExpenses(context, user?.Id!, cursor?.Cursor ?? DateTime.UtcNow.ToLocalTime())
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
 
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpenseByExpenseType(
         ClaimsPrincipal principal, [FromServices] UserManager<ApplicationUser> userManager,
-        [FromServices] CashPurseDbContext context, [AsParameters] CursorPagedRequest? cursor)
+        [FromServices] CashPurseDbContext context, [AsParameters] CursorPagedRequest cursor)
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait (false);
-        var result = await ExpenseDataService.GetCursorPagedTypeFilteredExpenses(context, user?.Id!, cursor?.Cursor ?? DateTimeOffset.MinValue)
+        var result = await ExpenseDataService.GetCursorPagedTypeFilteredExpenses(context, user?.Id!, cursor?.Cursor ?? DateTime.UtcNow.ToLocalTime())
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
@@ -75,14 +76,23 @@ public static class ExpenseEndpointHandler
         return userManager.FindByNameAsync(userId!);
     }
 
-    internal static Task HandleCreateExpense(HttpContext context)
+    internal static async Task<Created> HandleCreateExpense(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
+        [FromServices] UserManager<ApplicationUser> userManager, [FromBody] CreateExpenseRequest request)
     {
-        throw new NotImplementedException();
+        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var expense = ExpenseMapper.MapToCreateExpense(request);
+        // context.Expenses.Add(expense);
+        // await context.SaveChangesAsync().ConfigureAwait(false);
+        await ExpenseDataService.AddNewExpense(context, expense).ConfigureAwait(false);
+        return TypedResults.Created();
     }
 
-    internal static Task HandleUpdateExpense(HttpContext context)
+    internal static async Task<NoContent> HandleUpdateExpense(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
+        [FromServices] UserManager<ApplicationUser> userManager, [FromBody] UpdateExpenseRequest request)
     {
-        throw new NotImplementedException();
+        var expense = ExpenseMapper.MapToUpdateExpense(request);
+        await ExpenseDataService.UpdateExpense(context, expense).ConfigureAwait(false);
+        return TypedResults.NoContent();
     }
 
     internal static Task HandleDeleteExpense(HttpContext context)

@@ -1,8 +1,10 @@
-﻿using CashPurse.Server.ApiModels.BudgetListApiModels;
+﻿using System.Linq;
+using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace CashPurse.Server.CompiledEFQueries
 {
@@ -36,10 +38,10 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!)));
 
-        public static readonly Func<CashPurseDbContext, string, DateTimeOffset, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, string, DateTime, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedUserExpensesAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, string userId, DateTimeOffset cursor) =>
+                    (CashPurseDbContext context, string userId, DateTime cursor) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
                             .Where(e => e.ExpenseOwner.Id == userId)
@@ -47,10 +49,10 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!)));
 
-        public static readonly Func<CashPurseDbContext, DateTimeOffset, string, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedExpensesFilteredByExpenseTypeAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTimeOffset cursor, string userId) =>
+                    (CashPurseDbContext context, DateTime cursor, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseType)
                             .ThenBy(e => e.ExpenseDate)
@@ -86,10 +88,10 @@ namespace CashPurse.Server.CompiledEFQueries
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!))
                             .Take(7));
 
-        public static readonly Func<CashPurseDbContext, DateTimeOffset, string, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedUserExpensesFilteredByCurrencyUsedAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTimeOffset cursor, string userId) =>
+                    (CashPurseDbContext context, DateTime cursor, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
@@ -105,7 +107,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.Expenses.AsNoTracking()
                             .Where(e => e.ExpenseOwnerId == userId)
-                            .Where(e => e.ExpenseDate >= DateTime.Now.AddDays(-30))
+                            .Where(e => e.ExpenseDate >= DateTime.UtcNow.ToLocalTime().AddDays(-30))
                             .Select(e => new ExpenseDashBoardSummary(e.Amount, e.CurrencyUsed)));
 
         public static readonly Func<CashPurseDbContext, string, int, IAsyncEnumerable<ExpenseDashBoardSummary>>
@@ -114,7 +116,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId, int days) =>
                         context.Expenses.AsNoTracking()
                             .Where(e => e.ExpenseOwnerId == userId)
-                            .Where(e => e.ExpenseDate >= DateTime.Now.AddDays(-days))
+                            .Where(e => e.ExpenseDate >= DateTime.UtcNow.ToLocalTime().AddDays(-days))
                             .GroupBy(e => e.CurrencyUsed)
                             .Select(e => new ExpenseDashBoardSummary(e.Average(e => e.Amount), e.Key))
                 );
@@ -133,10 +135,10 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Take(7)
                 );
 
-        public static readonly Func<CashPurseDbContext, DateTimeOffset, string, IAsyncEnumerable<BudgetListModel>>
+        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<BudgetListModel>>
             GetCursorPagedUserBudgetLists =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTimeOffset cursor, string userId) =>
+                    (CashPurseDbContext context, DateTime cursor, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.Expense.ExpenseOwnerId == userId)

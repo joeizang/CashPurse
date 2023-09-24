@@ -1,4 +1,5 @@
 ﻿using CashPurse.Server.Models;
+using NodaTime;
 using System.ComponentModel.DataAnnotations;
 
 namespace CashPurse.Server.ApiModels.ExpensesApiModels;
@@ -31,8 +32,7 @@ public class CreateExpenseModel
 
     [Required]
     [Display(Name = "Expense Date")]
-    [DataType(DataType.Date)]
-    public DateTimeOffset ExpenseDate { get; set; }
+    public DateTime ExpenseDate { get; set; }
 }
 
 public class CreateExpenseInputModel
@@ -70,9 +70,9 @@ public class CreateExpenseInputModel
     public string ExpenseOwnerId { get; set; } = default!;
 }
 
-public record ExpenseIndexModel(string ExpenseName, string ExpenseDescription, decimal ExpenseAmount, DateTimeOffset ExpenseDate, Guid Id, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes);
+public record ExpenseIndexModel(string ExpenseName, string ExpenseDescription, decimal ExpenseAmount, DateTime ExpenseDate, Guid Id, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes);
 
-public record ExpenseUpdateModel(string ExpenseName, string ExpenseDescription, decimal Amount, DateTimeOffset ExpenseDate,
+public record ExpenseUpdateModel(string ExpenseName, string ExpenseDescription, decimal Amount, DateTime ExpenseDate,
     Guid ExpenseId, Currency CurrencyUsed, ExpenseType ExpenseType, string Notes, string ExpenseOwnerEmail);
 
 public record ExpenseDashBoardSummary(decimal Amount, Currency CurrencyUsed);

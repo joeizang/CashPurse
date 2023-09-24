@@ -3,13 +3,14 @@ using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
 public static class BudgetListDataService
 {
 
-    public static async Task<List<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context, string userId, DateTimeOffset cursor)
+    public static async Task<List<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context, string userId, DateTime cursor)
     {
         var results = new List<BudgetListModel>();
         await foreach (var budgetList in CompiledQueries.GetCursorPagedUserBudgetLists(_context, cursor, userId))

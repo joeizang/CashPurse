@@ -1,5 +1,16 @@
-﻿namespace CashPurse.Server.ApiModels;
+﻿using CashPurse.Server.ApiModels.BudgetListApiModels;
+using CashPurse.Server.Models;
+using NodaTime;
 
-public record CursorPagedRequest(DateTimeOffset Cursor);
+namespace CashPurse.Server.ApiModels;
 
-public record GetExpenseByCurrencyRequest(int currency) : CursorPagedRequest(DateTimeOffset.Now);
+public record CursorPagedRequest(DateTime Cursor);
+
+public record CreateExpenseRequest(string Name, string Description, decimal Amount, DateTime ExpenseDate,
+    ExpenseType ExpenseType, Currency CurrencyUsed, string ExpenseOwnerId, string Notes);
+
+public record UpdateExpenseRequest(string Name, string Description, decimal Amount, DateTime ExpenseDate,
+    ExpenseType ExpenseType, Currency CurrencyUsed, string ExpenseOwnerId, string Notes);
+
+public record UpdateBudgetListModel(string ListName, string Description, string ExpenseId,
+    IEnumerable<BudgetListItemModel> BudgetItems, Guid BudgetListId);

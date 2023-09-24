@@ -1,10 +1,12 @@
-﻿namespace CashPurse.Server.ApiModels.BudgetListApiModels;
+﻿using NodaTime;
+
+namespace CashPurse.Server.ApiModels.BudgetListApiModels;
 
 public record BudgetListItemModel(Guid ItemId, string Name, double Quantity, decimal Price, decimal UnitPrice, string Description);
 public record CreateBudgetListItemModel(string ListName, double Quantity, decimal Price,
     decimal UnitPrice, string Description);
 
-public record BudgetListModel(Guid ListId, string Name, string Description, string OwnerId, DateTimeOffset CreatedAt,
+public record BudgetListModel(Guid ListId, string Name, string Description, string OwnerId, DateTime CreatedAt,
     IEnumerable<BudgetListItemModel> BudgetItems);
 
 public record BudgetListIndexModel(Guid ListId, string Name, string Description, string OwnerId, int ItemCount,
