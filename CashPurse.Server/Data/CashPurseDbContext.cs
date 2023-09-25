@@ -36,12 +36,20 @@ public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Expense>()
             .HasMany(e => e.ExpenseBudget)
-            .WithOne()
-            .HasForeignKey(x => x.ExpenseEntityId)
-            .IsRequired(false);
+            .WithOne();
+        builder.Entity<BudgetList>()
+            .HasMany(b => b.BudgetItems)
+            .WithOne();
+        builder.Entity<BudgetList>()
+            .HasOne(b => b.Expense)
+            .WithMany(e => e.ExpenseBudget)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<Expense>()
             .HasIndex(e => e.ExpenseDate);
+        builder.Entity<Expense>()
+            .HasIndex(e => e.ExpenseOwnerId);
         builder.Entity<Expense>()
             .HasIndex(e => e.Amount);
         builder.Entity<BudgetList>()

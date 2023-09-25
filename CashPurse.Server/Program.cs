@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
-    options.UseSqlite("Data Source=cashpursedb.sqlite");
+    options.UseSqlite("Data Source=../../appdb.sqlite");
     // options.UseNpgsql(builder.Configuration["postgresconnectionstring"], options => options.UseNodaTime());
 });
 builder.Services.AddOutputCache(options => {

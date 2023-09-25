@@ -81,9 +81,9 @@ public static class ExpenseEndpointHandler
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
         var expense = ExpenseMapper.MapToCreateExpense(request);
-        // context.Expenses.Add(expense);
-        // await context.SaveChangesAsync().ConfigureAwait(false);
-        await ExpenseDataService.AddNewExpense(context, expense).ConfigureAwait(false);
+        context.Expenses.Add(expense);
+        await context.SaveChangesAsync().ConfigureAwait(false);
+        // await ExpenseDataService.AddNewExpense(context, expense).ConfigureAwait(false);
         return TypedResults.Created();
     }
 
