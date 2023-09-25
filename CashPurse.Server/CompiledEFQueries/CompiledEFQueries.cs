@@ -15,7 +15,7 @@ namespace CashPurse.Server.CompiledEFQueries
            EF.CompileQuery(
                (CashPurseDbContext context, string userId) =>
                    context.Expenses
-                       .AsNoTracking().Count(e => e.ExpenseOwner.Id == userId));
+                       .AsNoTracking().Count(e => e.ExpenseOwnerId == userId));
 
         public static readonly Func<CashPurseDbContext, string, Guid, ExpenseIndexModel>
             GetExpenseById =
@@ -34,7 +34,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwner.Id == userId)
+                            .Where(e => e.ExpenseOwnerId == userId)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!)));
 
@@ -44,7 +44,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId, DateTime cursor) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwner.Id == userId)
+                            .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= cursor)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!)));

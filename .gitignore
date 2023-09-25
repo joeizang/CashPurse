@@ -372,3 +372,4 @@ FodyWeavers.xsd
 CashPurse.Server/.env
 CashPurse.Server/cashpursedb.sqlite-wal
 CashPurse.Server/cashpursedb.sqlite-shm
+.DS_Store

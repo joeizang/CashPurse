@@ -19,14 +19,5 @@ public class Expense : BaseEntity
 
     public required ExpenseType ExpenseType { get; set; }
 
-    public ApplicationUser ExpenseOwner { get; set; } = default!;
-
     public required string ExpenseOwnerId { get; set; }
-
-    public List<Guid> ExpenseBudgetLists { get; set; }
-
-    public Expense()
-    {
-        ExpenseBudgetLists = new();
-    }
 }

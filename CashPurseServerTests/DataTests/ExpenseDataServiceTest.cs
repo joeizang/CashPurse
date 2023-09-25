@@ -15,16 +15,16 @@ namespace CashPurseServerTests.DataTests
 {
     public class ExpenseDataServiceTest
     {
-        private readonly IServiceScope _scope;
-        public ExpenseDataServiceTest()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<UserManager<ApplicationUser>>();
+        // private readonly IServiceScope _scope;
+        // public ExpenseDataServiceTest()
+        // {
+        //     var serviceCollection = new ServiceCollection();
+        //     serviceCollection.AddScoped<UserManager<ApplicationUser>>();
 
-            var provider = serviceCollection.BuildServiceProvider();
-            _scope = provider.CreateScope();
+        //     var provider = serviceCollection.BuildServiceProvider();
+        //     _scope = provider.CreateScope();
             
-        }
+        // }
 
 
         [Fact]
@@ -34,17 +34,13 @@ namespace CashPurseServerTests.DataTests
             var userId = Guid.NewGuid().ToString("D");
             var sqlitedb = new SqliteConnection("Filename=:memory:");
             sqlitedb.Open();
-
-            var usermanager = _scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            await usermanager.CreateAsync(new ApplicationUser
-            {
-                UserName = "test@test.com",
-                Email = "test@test.com"
-            });
-            var user = await usermanager.FindByEmailAsync("test@test.com");
             var optionsBuilder = new DbContextOptionsBuilder<CashPurseDbContext>();
             var options = optionsBuilder.UseSqlite(sqlitedb).Options;
             await using var db = new CashPurseDbContext(options);
+            if(db.Database.EnsureCreated())
+            {
+                Console.WriteLine("Database created");
+            }
             var expense = new Expense
             {
                 Name = "Buy a car for Ushim",
@@ -53,15 +49,48 @@ namespace CashPurseServerTests.DataTests
                 Amount = 30000000,
                 CurrencyUsed = Currency.NGN,
                 ExpenseType = ExpenseType.Transportation,
-                ExpenseOwnerId = user?.Id,
-                ExpenseOwner = user,
-                Id = Guid.NewGuid(),
-                ExpenseBudgetLists = new()
+                ExpenseOwnerId = userId,
+                Id = Guid.NewGuid()
             };
             //Act
             await ExpenseDataService.AddNewExpense(db, expense).ConfigureAwait(false);
             //Assert
             Assert.NotEmpty(db.Expenses.ToList());
+        }
+
+        [Fact]
+        public async void UpdateExpenseWithDataService_UpdatesExpenseInDB()
+        {
+            //Arrange
+            var userId = Guid.NewGuid().ToString("D");
+            var sqlitedb = new SqliteConnection("Filename=:memory:");
+            sqlitedb.Open();
+            var optionsBuilder = new DbContextOptionsBuilder<CashPurseDbContext>();
+            var options = optionsBuilder.UseSqlite(sqlitedb).Options;
+            await using var db = new CashPurseDbContext(options);
+            if (db.Database.EnsureCreated())
+            {
+                Console.WriteLine("Database created");
+            }
+            var expense = new Expense
+            {
+                Name = "Buy a car for Ushim",
+                Description = "Bought a Toyota Camry for Ushim",
+                ExpenseDate = DateTime.Now,
+                Amount = 30000000,
+                CurrencyUsed = Currency.NGN,
+                ExpenseType = ExpenseType.Transportation,
+                ExpenseOwnerId = userId,
+                Id = Guid.NewGuid()
+            };
+            //Act
+            await ExpenseDataService.AddNewExpense(db, expense).ConfigureAwait(false);
+            var expenseupdate = await db.Expenses.Where(x => x.Amount == 30000000).SingleAsync().ConfigureAwait(false);
+            expenseupdate.Name = "Buy a car for Ushim My Love";
+            await ExpenseDataService.UpdateExpense(db, expense).ConfigureAwait(false);
+            //Assert
+            Assert.Equal("Buy a car for Ushim My Love", db.Expenses.Single().Name);
+            Assert.EndsWith("Love", db.Expenses.Single().Name);
         }
     }
 }
