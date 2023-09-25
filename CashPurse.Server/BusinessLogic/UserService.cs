@@ -1,4 +1,4 @@
-﻿using CashPurse.Server.Models;
+using CashPurse.Server.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace CashPurse.Server.BusinessLogic;
@@ -34,4 +34,6 @@ public class UserService : IUserService
             _contextAccessor.HttpContext?.User!.Identity!.Name!);
         return currentlyLoggedInUser!;
     }
+
+
 }
