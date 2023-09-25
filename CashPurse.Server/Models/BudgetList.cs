@@ -8,7 +8,5 @@ public class BudgetList : BaseEntity
 
     public required List<BudgetListItem> BudgetItems { get; set; }
 
-    public Guid ExpenseEntityId { get; set; }
-
-    public Expense Expense { get; set; } = default!;
+    public Guid OwnerExpenseId { get; set; }
 }

@@ -23,6 +23,10 @@ public class Expense : BaseEntity
 
     public required string ExpenseOwnerId { get; set; }
 
-    public List<BudgetList> ExpenseBudget { get; set; } = new();
+    public List<Guid> ExpenseBudgetLists { get; set; }
 
+    public Expense()
+    {
+        ExpenseBudgetLists = new();
+    }
 }

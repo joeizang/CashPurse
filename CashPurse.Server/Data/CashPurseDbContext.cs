@@ -34,17 +34,14 @@ public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
             .Property(b => b.Price)
             .HasPrecision(18, 2);
 
-        builder.Entity<Expense>()
-            .HasMany(e => e.ExpenseBudget)
-            .WithOne();
         builder.Entity<BudgetList>()
             .HasMany(b => b.BudgetItems)
             .WithOne();
-        builder.Entity<BudgetList>()
-            .HasOne(b => b.Expense)
-            .WithMany(e => e.ExpenseBudget)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.NoAction);
+        // builder.Entity<BudgetList>()
+        //     .HasOne(b => b.Expense)
+        //     .WithMany(e => e.ExpenseBudget)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<Expense>()
             .HasIndex(e => e.ExpenseDate);

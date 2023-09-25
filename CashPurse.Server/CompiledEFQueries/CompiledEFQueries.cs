@@ -124,40 +124,39 @@ namespace CashPurse.Server.CompiledEFQueries
         public static readonly Func<CashPurseDbContext, string, IAsyncEnumerable<BudgetListModel>>
             GetUserBudgetLists =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, string userId) =>
+                    (CashPurseDbContext context, Guid expenseId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.Expense.ExpenseOwnerId == userId)
+                            .Where(b => b.OwnerExpenseId == expenseId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.Expense.ExpenseOwnerId, b.CreatedAt,
+                                b.ExpenseOwnerId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
                             .Take(7)
                 );
 
-        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<BudgetListModel>>
+        public static readonly Func<CashPurseDbContext, DateTime, Guid, IAsyncEnumerable<BudgetListModel>>
             GetCursorPagedUserBudgetLists =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTime cursor, string userId) =>
+                    (CashPurseDbContext context, DateTime cursor, Guid expenseId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.Expense.ExpenseOwnerId == userId)
+                            .Where(b => b.OwnerExpenseId == expenseId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.Expense.ExpenseOwnerId, b.CreatedAt,
+                                b.ExpenseOwnerId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
                             .Take(7)
                 );
 
-        public static readonly Func<CashPurseDbContext, string, Guid, IEnumerable<BudgetList>>
+        public static readonly Func<CashPurseDbContext, Guid, IEnumerable<BudgetList>>
             GetUserBudgetListsForCount =
                 EF.CompileQuery(
-                    (CashPurseDbContext context, string userId, Guid id) =>
+                    (CashPurseDbContext context, Guid id) =>
                         context.BudgetLists
                             .AsNoTracking()
-                            .Where(b => b.Expense.ExpenseOwnerId == userId)
-                            .Where(b => b.Id == id)
+                            .Where(b => b.OwnerExpenseId == id)
                 );
     }
 }
