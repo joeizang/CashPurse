@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.Data;
@@ -121,7 +121,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(e => new ExpenseDashBoardSummary(e.Average(e => e.Amount), e.Key))
                 );
         // BUDGETLIST QUERIES //
-        public static readonly Func<CashPurseDbContext, string, IAsyncEnumerable<BudgetListModel>>
+        public static readonly Func<CashPurseDbContext, Guid, IAsyncEnumerable<BudgetListModel>>
             GetUserBudgetLists =
                 EF.CompileAsyncQuery(
                     (CashPurseDbContext context, Guid expenseId) =>
@@ -129,7 +129,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.OwnerExpenseId == expenseId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.ExpenseOwnerId, b.CreatedAt,
+                                b.OwnerExpenseId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
                             .Take(7)
@@ -144,7 +144,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Where(b => b.OwnerExpenseId == expenseId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.ExpenseOwnerId, b.CreatedAt,
+                                b.OwnerExpenseId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
                             .Take(7)

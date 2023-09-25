@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.DataServices;
@@ -7,6 +7,7 @@ using CashPurse.Server.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace CashPurse.Server;
@@ -26,7 +27,8 @@ public static class BudgetListEndpointHandler
         try
         {
             var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
-            var alternative = await BudgetListDataService.GetUserBudgetLists(context, userId: user!.Id, cursor:  cursor.Cursor)
+            var expense = context.Expenses.AsNoTracking().Where(x => x.ExpenseOwnerId == user!.Id).First();
+            var alternative = await BudgetListDataService.GetUserBudgetLists(context, expense.Id, cursor:  cursor.Cursor)
                 .ConfigureAwait(false);
             if(alternative.Count == 0)
                 return TypedResults.Ok(new CursorPagedResult<List<BudgetListModel>>(DateTime.UtcNow.ToLocalTime(), alternative));

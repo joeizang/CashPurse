@@ -1,4 +1,4 @@
-﻿using CashPurse.Server.ApiModels.BudgetListApiModels;
+using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
@@ -10,10 +10,10 @@ namespace CashPurse.Server.BusinessLogic.DataServices;
 public static class BudgetListDataService
 {
 
-    public static async Task<List<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context, string userId, DateTime cursor)
+    public static async Task<List<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context, Guid ownerExpenseId, DateTime cursor)
     {
         var results = new List<BudgetListModel>();
-        await foreach (var budgetList in CompiledQueries.GetCursorPagedUserBudgetLists(_context, cursor, userId))
+        await foreach (var budgetList in CompiledQueries.GetCursorPagedUserBudgetLists(_context, cursor, ownerExpenseId))
         {
             results.Add(budgetList);
         }
@@ -21,10 +21,10 @@ public static class BudgetListDataService
         return results;
     }
 
-    public static int CountBudgetListItems(CashPurseDbContext _context, string userId, Guid id)
+    public static int CountBudgetListItems(CashPurseDbContext _context, Guid id)
     {
         var result = CompiledQueries
-            .GetUserBudgetListsForCount(_context, userId, id)
+            .GetUserBudgetListsForCount(_context, id)
             .SingleOrDefault()!.BudgetItems.Count;
         return result;
     }
