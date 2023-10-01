@@ -1,10 +1,16 @@
+using CashPurse.Server.ApiModels;
+using CashPurse.Server.BusinessLogic.Validators;
 using CashPurse.Server.Data;
 using CashPurse.Server.Endpoints;
 using CashPurse.Server.Models;
+using CashPurse.Server.SwaggerConfig;
 using dotenv.net;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 DotEnv.Load();
 
@@ -16,11 +22,12 @@ builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
     options.UseSqlite("Data Source=../../appdb1.sqlite");
 });
 builder.Services.AddOutputCache(options => {
-    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(12)));
-    options.AddPolicy("CacheDataPage", builder => builder.Expire(TimeSpan.FromSeconds(30)));
+    options.AddBasePolicy(b => b.Expire(TimeSpan.FromSeconds(12)));
+    options.AddPolicy("CacheDataPage", b => b.Expire(TimeSpan.FromSeconds(30)));
 });
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddScoped<IValidator<CreateExpenseRequest>, ExpenseValidator>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<CashPurseDbContext>();
@@ -29,6 +36,7 @@ builder.Services.AddAuthorization();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 

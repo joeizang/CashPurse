@@ -1,4 +1,6 @@
-﻿namespace CashPurse.Server;
+﻿using CashPurse.Server.BusinessLogic.EndpointHandlers;
+
+namespace CashPurse.Server;
 
 public static class BudgetListApiEndpoints
 {

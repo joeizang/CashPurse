@@ -12,7 +12,7 @@ public class BudgetListItem : BaseEntity
 
     public string Description { get; set; } = string.Empty;
 
-    public void GetItemPrice()
+    public void CalculateItemPrice()
     {
         Price = UnitPrice * (decimal)Quantity;
     }

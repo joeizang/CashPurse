@@ -3,6 +3,7 @@ using System;
 using CashPurse.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CashPurse.Server.Migrations
 {
     [DbContext(typeof(CashPurseDbContext))]
-    partial class CashPurseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231001231145_BudgetListMods")]
+    partial class BudgetListMods
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0-rc.1.23419.6");
