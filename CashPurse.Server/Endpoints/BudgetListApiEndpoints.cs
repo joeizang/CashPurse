@@ -1,4 +1,5 @@
-﻿using CashPurse.Server.BusinessLogic.EndpointHandlers;
+﻿using CashPurse.Server.BusinessLogic.EndpointFilters;
+using CashPurse.Server.BusinessLogic.EndpointHandlers;
 
 namespace CashPurse.Server;
 
@@ -10,6 +11,13 @@ public static class BudgetListApiEndpoints
         var budgetListGroupWithIds = budgetListGroup.MapGroup("/{budgetListId:guid}");
 
         budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet);
+
+        budgetListGroup.MapGet("/cursor", BudgetListEndpointHandler.HandleCursorPagedGet);
+
+        budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList)
+            .AddEndpointFilter<CreateBudgetListFilter>();
+
+        budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList);
 
         return budgetListGroup;
     }

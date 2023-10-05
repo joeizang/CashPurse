@@ -3,6 +3,7 @@ using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.DataServices;
 using CashPurse.Server.Data;
+using CashPurse.Server.MapperConfiguration;
 using CashPurse.Server.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -62,7 +63,7 @@ public static class BudgetListEndpointHandler
 
     public static async Task<Created> CreateBudgetList(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        [FromBody]CreateBudgetListModel inputModel
+        [FromBody]CreateBudgetListRequest inputModel
     ) 
     {
         var budgetList = BudgetListMapper.MapCreateBudgetList(inputModel);
@@ -72,7 +73,7 @@ public static class BudgetListEndpointHandler
 
     public static async Task<NoContent> UpdateBudgetList(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        [FromBody]UpdateBudgetListModel inputModel
+        [FromBody]UpdateBudgetListRequest inputModel
     ) 
     {
         var budgetList = BudgetListMapper.MapUpdateBudgetList(inputModel);

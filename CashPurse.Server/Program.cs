@@ -1,4 +1,6 @@
+using CashPurse.Server;
 using CashPurse.Server.ApiModels;
+using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.Validators;
 using CashPurse.Server.Data;
 using CashPurse.Server.Endpoints;
@@ -28,6 +30,8 @@ builder.Services.AddOutputCache(options => {
 
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 builder.Services.AddScoped<IValidator<CreateExpenseRequest>, ExpenseValidator>();
+builder.Services.AddScoped<IValidator<UpdateExpenseRequest>, ExpenseUpdateValidator>();
+builder.Services.AddScoped<IValidator<CreateBudgetListRequest>>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<CashPurseDbContext>();
@@ -52,6 +56,7 @@ app.UseHttpsRedirection();
 app.MapGroup("/auth").MapIdentityApi<ApplicationUser>();
 
 app.MapExpenseEndpoints();
+app.MapBudgetListEndpoints();
 
 app.Run();
 

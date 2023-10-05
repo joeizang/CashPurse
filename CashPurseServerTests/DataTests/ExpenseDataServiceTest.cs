@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CashPurse.Server.ApiModels;
 
 namespace CashPurseServerTests.DataTests
 {
@@ -85,9 +86,14 @@ namespace CashPurseServerTests.DataTests
             };
             //Act
             await ExpenseDataService.AddNewExpense(db, expense).ConfigureAwait(false);
-            var expenseupdate = await db.Expenses.Where(x => x.Amount == 30000000).SingleAsync().ConfigureAwait(false);
+            var expenseupdate = await db.Expenses.Where(x => x.Amount == 30000000)
+                .SingleAsync()
+                .ConfigureAwait(false);
+            var updateModel = new UpdateExpenseRequest(expenseupdate.Id, "Buy a car for Ushim My Love",
+                expenseupdate.Description, expenseupdate.Amount, expenseupdate.ExpenseDate, expenseupdate.ExpenseType,
+                expenseupdate.CurrencyUsed, expenseupdate.ExpenseOwnerId, expenseupdate.Notes);
             expenseupdate.Name = "Buy a car for Ushim My Love";
-            await ExpenseDataService.UpdateExpense(db, expense).ConfigureAwait(false);
+            await ExpenseDataService.UpdateExpense(db, expenseupdate, updateModel).ConfigureAwait(false);
             //Assert
             Assert.Equal("Buy a car for Ushim My Love", db.Expenses.Single().Name);
             Assert.EndsWith("Love", db.Expenses.Single().Name);
