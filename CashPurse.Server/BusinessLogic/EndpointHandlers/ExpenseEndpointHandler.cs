@@ -6,7 +6,6 @@ using CashPurse.Server.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime;
 using System.Security.Claims;
 
 namespace CashPurse.Server.BusinessLogic.EndpointHandlers;
@@ -112,13 +111,12 @@ public static class ExpenseEndpointHandler
         [FromRoute] Guid expenseId)
     {
         var target = await context.Expenses.FindAsync(expenseId).ConfigureAwait(false);
-        // var expense = ExpenseMapper.MapToUpdateExpense(request);
-        await ExpenseDataService.UpdateExpense(context, target, request).ConfigureAwait(false);
+        await ExpenseDataService.UpdateExpense(context, target!, request).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 
-    internal static Task HandleDeleteExpense(HttpContext context)
-    {
-        throw new NotImplementedException();
-    }
+    // internal static Task HandleDeleteExpense(HttpContext context)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }
