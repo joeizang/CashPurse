@@ -4,7 +4,6 @@ using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace CashPurse.Server.CompiledEFQueries
 {
