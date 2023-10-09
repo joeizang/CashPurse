@@ -57,6 +57,7 @@ public static class BudgetListEndpointHandler
         }
         catch (Exception )
         {
+            // TODO: Add logging to better analyze cause of exceptions in api.
             throw;
         }
     }
@@ -78,6 +79,38 @@ public static class BudgetListEndpointHandler
     {
         var budgetList = BudgetListMapper.MapUpdateBudgetList(inputModel);
         await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
+        return TypedResults.NoContent();
+    }
+    
+    public static async Task<PagedResult<BudgetListItemModel>> HandleGetBudgetListItems(
+        [FromServices] CashPurseDbContext context, Guid budgetListId)
+    {
+        var results = await BudgetListDataService
+            .GetBudgetListItems(context, budgetListId).ConfigureAwait(false);
+        return results;
+    }
+    
+    public static async Task<CursorPagedResult<List<BudgetListItemModel>>> HandleGetCursorPagedBudgetListItems(
+        [FromServices] CashPurseDbContext context, Guid budgetListId, DateTime cursor)
+    {
+        var results = await BudgetListDataService
+            .GetCursorPagedBudgetListItems(context, budgetListId, cursor)
+            .ConfigureAwait(false);
+        return results;
+    }
+
+    public static async Task<Created> CreateBudgetListItem([FromServices] CashPurseDbContext context,
+        [FromBody] CreateBudgetListItemRequest inputModel)
+    {
+        var item = BudgetListItemMapper.MapCreateBudgetListItemRequest(inputModel);
+        await BudgetListDataService.AddNewBudgetListItem(context, item);
+        return TypedResults.Created();
+    }
+    
+    public static async Task<NoContent> UpdateBudgetListItem([FromServices] CashPurseDbContext context,
+        [FromBody] UpdateBudgetListItemRequest inputModel)
+    {
+        await BudgetListDataService.UpdateBudgetListItem(context, inputModel).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
 }

@@ -31,7 +31,10 @@ builder.Services.AddOutputCache(options => {
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 builder.Services.AddScoped<IValidator<CreateExpenseRequest>, ExpenseValidator>();
 builder.Services.AddScoped<IValidator<UpdateExpenseRequest>, ExpenseUpdateValidator>();
-builder.Services.AddScoped<IValidator<CreateBudgetListRequest>>();
+builder.Services.AddScoped<IValidator<CreateBudgetListRequest>, BudgetListCreateValidator>();
+builder.Services.AddScoped<IValidator<UpdateBudgetListRequest>, BudgetListUpdateValidator>();
+builder.Services.AddScoped<IValidator<CreateBudgetListItemRequest>, BudgetListItemValidator>();
+builder.Services.AddScoped<IValidator<UpdateBudgetListItemRequest>, UpdateBudgetListItemValidator>();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<CashPurseDbContext>();

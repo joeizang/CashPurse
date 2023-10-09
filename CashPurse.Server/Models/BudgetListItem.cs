@@ -11,6 +11,8 @@ public class BudgetListItem : BaseEntity
     public double Quantity { get; set; }
 
     public string Description { get; set; } = string.Empty;
+    
+    public Guid BudgetListId { get; set; }
 
     public void CalculateItemPrice()
     {

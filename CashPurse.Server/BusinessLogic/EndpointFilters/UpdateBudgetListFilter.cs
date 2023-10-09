@@ -8,6 +8,8 @@ public class UpdateBudgetListFilter(IValidator<UpdateBudgetListRequest> validato
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        return await next(context);
+        var budget = context.GetArgument<UpdateBudgetListRequest>(3);
+        var result = await validator.ValidateAsync(budget).ConfigureAwait(false);
+        return result.IsValid == false ? Results.ValidationProblem(result.ToDictionary()) : await next(context);
     }
 }

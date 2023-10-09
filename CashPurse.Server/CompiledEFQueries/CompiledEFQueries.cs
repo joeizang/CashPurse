@@ -169,7 +169,8 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.OwnerExpenseId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
-                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
+                                    x.Description, x.CreatedAt))))
                             .Take(7)
                 );
 
@@ -183,8 +184,9 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.OwnerExpenseId, b.CreatedAt,
-                                b.BudgetItems.Select(x => new BudgetListItemModel(
-                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                                b.BudgetItems.Select(x => 
+                                    new BudgetListItemModel(x.Id, x.Description,
+                                        x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
                             .Take(7)
                 );
         
@@ -199,7 +201,32 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.OwnerExpenseId, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
-                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice, x.Description))))
+                                    x.Id, x.Name, x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
+                            .Take(7)
+                );
+        
+        public static readonly Func<CashPurseDbContext, Guid, IAsyncEnumerable<BudgetListItemModel>>
+            GetPagedBudgetListItems =
+                EF.CompileAsyncQuery(
+                    (CashPurseDbContext context, Guid budgetListId) =>
+                        context.BudgetListItems.AsNoTracking()
+                            .OrderBy(b => b.CreatedAt)
+                            .Where(b => b.BudgetListId == budgetListId)
+                            .Select(b => new BudgetListItemModel(b.Id, b.Description, b.Quantity, b.Price, b.UnitPrice,
+                                b.Description, b.CreatedAt))
+                            .Take(7)
+                );
+        
+        public static readonly Func<CashPurseDbContext, DateTime, Guid, IAsyncEnumerable<BudgetListItemModel>>
+            GetCursorPagedBudgetListItems =
+                EF.CompileAsyncQuery(
+                    (CashPurseDbContext context, DateTime cursor, Guid budgetListId) =>
+                        context.BudgetListItems.AsNoTracking()
+                            .OrderBy(b => b.CreatedAt)
+                            .Where(b => b.BudgetListId == budgetListId)
+                            .Where(b => b.CreatedAt >= cursor)
+                            .Select(b => new BudgetListItemModel(b.Id, b.Description, b.Quantity, b.Price, b.UnitPrice,
+                                b.Description, b.CreatedAt))
                             .Take(7)
                 );
 

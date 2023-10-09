@@ -49,7 +49,7 @@ public static class ExpenseApiEndpoints
                 return await next(context);
             })
             .AddEndpointFilter<ExpenseUpdateFilter>();
-        expenseGroupWithIds.MapDelete("", ExpenseEndpointHandler.HandleDeleteExpense);
+        // expenseGroupWithIds.MapDelete("", ExpenseEndpointHandler.HandleDeleteExpense);
 
         return expenseGroup;
     }
