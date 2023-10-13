@@ -32,7 +32,7 @@ public class CreateExpenseModel
 
     [Required]
     [Display(Name = "Expense Date")]
-    public DateTime ExpenseDate { get; set; }
+    public DateOnly ExpenseDate { get; set; }
 }
 
 public class CreateExpenseInputModel
@@ -61,7 +61,7 @@ public class CreateExpenseInputModel
 
     [Required]
     [Display(Name = "Expense Date")]
-    public DateTime ExpenseDate { get; set; }
+    public DateOnly ExpenseDate { get; set; }
 
     [Required]
     [Display(Name = "Expense Owner")]
@@ -69,9 +69,9 @@ public class CreateExpenseInputModel
 }
 
 public record ExpenseIndexModel(string ExpenseName, string ExpenseDescription, decimal ExpenseAmount,
-    DateTime ExpenseDate, Guid Id, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes, string ExpenseOwnerEmail);
+    DateOnly ExpenseDate, Guid Id, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes, string ExpenseOwnerEmail);
 
-public record ExpenseUpdateModel(string ExpenseName, string ExpenseDescription, decimal Amount, DateTime ExpenseDate,
+public record ExpenseUpdateModel(string ExpenseName, string ExpenseDescription, decimal Amount, DateOnly ExpenseDate,
     Guid ExpenseId, Currency CurrencyUsed, ExpenseType ExpenseType, string Notes, string ExpenseOwnerEmail);
 
 public record ExpenseDashBoardSummary(decimal Amount, Currency CurrencyUsed);

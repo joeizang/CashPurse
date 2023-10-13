@@ -22,44 +22,27 @@ public static class BudgetListEndpointHandler
     }
 
     public static async Task<Ok<PagedResult<BudgetListModel>>> HandleGet(ClaimsPrincipal principal,
-        [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        DateTime cursor)
+        [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager)
     {
-        try
-        {
-            var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
-            var expense = context.Expenses.AsNoTracking().First(x => x.ExpenseOwnerId == user!.Id);
-            var alternative = await BudgetListDataService.GetUserBudgetLists(context, expense.Id)
-                .ConfigureAwait(false);
-            if(alternative?.Items.Count == 0)
-                return TypedResults.Ok(alternative);
-            return TypedResults.Ok(alternative!);
-        }
-        catch (Exception )
-        {
-            throw;
-        }
+        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var expense = await context.Expenses.AsNoTracking()
+            .Where(x => x.ExpenseOwnerId == user!.Id)
+            .ToArrayAsync(CancellationToken.None);
+        var alternative = await BudgetListDataService.GetUserBudgetLists(context, user!.Id)
+            .ConfigureAwait(false);
+        return TypedResults.Ok(alternative?.Items.Count == 0 ? alternative : alternative!);
     }
     
     public static async Task<Ok<CursorPagedResult<List<BudgetListModel>>>> HandleCursorPagedGet(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        DateTime cursor)
+        DateOnly cursor)
     {
-        try
-        {
-            var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
-            var expense = context.Expenses.AsNoTracking().First(x => x.ExpenseOwnerId == user!.Id);
-            var alternative = await BudgetListDataService.GetCursorPagedUserBudgetLists(context, expense.Id, cursor)
-                .ConfigureAwait(false);
-            if(alternative?.Data.Count == 0)
-                return TypedResults.Ok(alternative);
-            return TypedResults.Ok(alternative!);
-        }
-        catch (Exception )
-        {
-            // TODO: Add logging to better analyze cause of exceptions in api.
-            throw;
-        }
+        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var expense = context.Expenses.AsNoTracking().First(x => x.ExpenseOwnerId == user!.Id);
+        var alternative = await BudgetListDataService
+            .GetCursorPagedUserBudgetLists(context, user!.Id, cursor)
+            .ConfigureAwait(false);
+        return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
 
     public static async Task<Created> CreateBudgetList(ClaimsPrincipal principal,
@@ -67,9 +50,19 @@ public static class BudgetListEndpointHandler
         [FromBody]CreateBudgetListRequest inputModel
     ) 
     {
-        var budgetList = BudgetListMapper.MapCreateBudgetList(inputModel);
-        await BudgetListDataService.AddNewBudgetList(context, budgetList).ConfigureAwait(false);
-        return TypedResults.Created();
+        try
+        {
+            var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+            var budgetList = BudgetListMapper.MapCreateBudgetList(inputModel);
+            budgetList.OwnerId = user!.Id;
+            await BudgetListDataService.AddNewBudgetList(context, budgetList).ConfigureAwait(false);
+            return TypedResults.Created();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public static async Task<NoContent> UpdateBudgetList(ClaimsPrincipal principal,
@@ -77,7 +70,9 @@ public static class BudgetListEndpointHandler
         [FromBody]UpdateBudgetListRequest inputModel
     ) 
     {
+        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
         var budgetList = BudgetListMapper.MapUpdateBudgetList(inputModel);
+        budgetList.OwnerId = user!.Id; //clean up update budget list
         await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
@@ -91,7 +86,7 @@ public static class BudgetListEndpointHandler
     }
     
     public static async Task<CursorPagedResult<List<BudgetListItemModel>>> HandleGetCursorPagedBudgetListItems(
-        [FromServices] CashPurseDbContext context, Guid budgetListId, DateTime cursor)
+        [FromServices] CashPurseDbContext context, Guid budgetListId, DateOnly cursor)
     {
         var results = await BudgetListDataService
             .GetCursorPagedBudgetListItems(context, budgetListId, cursor)
@@ -100,7 +95,7 @@ public static class BudgetListEndpointHandler
     }
 
     public static async Task<Created> CreateBudgetListItem([FromServices] CashPurseDbContext context,
-        [FromBody] CreateBudgetListItemRequest inputModel)
+        Guid budgetListId, [FromBody] CreateBudgetListItemRequest inputModel)
     {
         var item = BudgetListItemMapper.MapCreateBudgetListItemRequest(inputModel);
         await BudgetListDataService.AddNewBudgetListItem(context, item);

@@ -38,10 +38,10 @@ namespace CashPurse.Server.CompiledEFQueries
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
 
-        public static readonly Func<CashPurseDbContext, string, DateTime, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, string, DateOnly, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedUserExpensesAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, string userId, DateTime cursor) =>
+                    (CashPurseDbContext context, string userId, DateOnly cursor) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
                             .Where(e => e.ExpenseOwnerId == userId)
@@ -61,10 +61,10 @@ namespace CashPurse.Server.CompiledEFQueries
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
 
-        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, DateOnly, string, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedExpensesFilteredByExpenseTypeAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTime cursor, string userId) =>
+                    (CashPurseDbContext context, DateOnly cursor, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseType)
                             .ThenBy(e => e.ExpenseDate)
@@ -112,10 +112,10 @@ namespace CashPurse.Server.CompiledEFQueries
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
 
-        public static readonly Func<CashPurseDbContext, DateTime, string, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, DateOnly, string, IAsyncEnumerable<ExpenseIndexModel>>
             GetCursorPagedUserExpensesFilteredByCurrencyUsedAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTime cursor, string userId) =>
+                    (CashPurseDbContext context, DateOnly cursor, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
@@ -143,7 +143,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.Expenses.AsNoTracking()
                             .Where(e => e.ExpenseOwnerId == userId)
-                            .Where(e => e.ExpenseDate >= DateTime.UtcNow.ToLocalTime().AddDays(-30))
+                            .Where(e => e.ExpenseDate >= DateOnly.FromDateTime(DateTime.Now.ToLocalTime().AddDays(-30)))
                             .Select(e => new ExpenseDashBoardSummary(e.Amount, e.CurrencyUsed))
                             .Take(30));
 
@@ -153,37 +153,37 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId, int days) =>
                         context.Expenses.AsNoTracking()
                             .Where(e => e.ExpenseOwnerId == userId)
-                            .Where(e => e.ExpenseDate >= DateTime.UtcNow.ToLocalTime().AddDays(-days))
+                            .Where(e => e.ExpenseDate >= DateOnly.FromDateTime(DateTime.Now.ToLocalTime().AddDays(-days)))
                             .GroupBy(e => e.CurrencyUsed)
                             .Select(e => 
                                 new ExpenseDashBoardSummary(e.Average(e => e.Amount), e.Key))
                 );
         // BUDGETLIST QUERIES //
-        public static readonly Func<CashPurseDbContext, Guid, IAsyncEnumerable<BudgetListModel>>
+        public static readonly Func<CashPurseDbContext, string, IAsyncEnumerable<BudgetListModel>>
             GetUserBudgetLists =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, Guid expenseId) =>
+                    (CashPurseDbContext context, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.OwnerExpenseId == expenseId)
+                            .Where(b => b.OwnerId == userId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.OwnerExpenseId, b.CreatedAt,
+                                b.ExpenseId.Value, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
                                     x.Description, x.CreatedAt))))
                             .Take(7)
                 );
 
-        public static readonly Func<CashPurseDbContext, DateTime, Guid, IAsyncEnumerable<BudgetListModel>>
+        public static readonly Func<CashPurseDbContext, DateOnly, string, IAsyncEnumerable<BudgetListModel>>
             GetCursorPagedUserBudgetLists =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTime cursor, Guid expenseId) =>
+                    (CashPurseDbContext context, DateOnly cursor, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.OwnerExpenseId == expenseId)
+                            .Where(b => b.OwnerId == userId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.OwnerExpenseId, b.CreatedAt,
+                                b.ExpenseId.Value, b.CreatedAt,
                                 b.BudgetItems.Select(x => 
                                     new BudgetListItemModel(x.Id, x.Description,
                                         x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
@@ -196,10 +196,10 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, Guid expenseId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.OwnerExpenseId == expenseId)
+                            .Where(b => b.ExpenseId == expenseId)
                             // .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.OwnerExpenseId, b.CreatedAt,
+                                b.ExpenseId.Value, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Name, x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
                             .Take(7)
@@ -217,10 +217,10 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Take(7)
                 );
         
-        public static readonly Func<CashPurseDbContext, DateTime, Guid, IAsyncEnumerable<BudgetListItemModel>>
+        public static readonly Func<CashPurseDbContext, DateOnly, Guid, IAsyncEnumerable<BudgetListItemModel>>
             GetCursorPagedBudgetListItems =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, DateTime cursor, Guid budgetListId) =>
+                    (CashPurseDbContext context, DateOnly cursor, Guid budgetListId) =>
                         context.BudgetListItems.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.BudgetListId == budgetListId)
@@ -236,7 +236,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, Guid id) =>
                         context.BudgetLists
                             .AsNoTracking()
-                            .Where(b => b.OwnerExpenseId == id)
+                            .Where(b => b.ExpenseId == id)
                 );
     }
 }

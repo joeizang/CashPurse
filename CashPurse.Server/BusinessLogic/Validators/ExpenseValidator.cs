@@ -19,9 +19,9 @@ public class ExpenseValidator : AbstractValidator<CreateExpenseRequest>
             .NotEmpty()
             .NotEqual("");
         RuleFor(e => e.ExpenseDate)
-            .NotEqual(DateTime.MinValue)
-            .NotEqual(DateTime.MaxValue)
-            .NotEqual(DateTime.Now.AddDays(-32));
+            .NotEqual(DateOnly.MinValue)
+            .NotEqual(DateOnly.MaxValue)
+            .NotEqual(DateOnly.FromDateTime(DateTime.Now.AddDays(-32)));
         RuleFor(e => e.Amount)
             .NotEqual(decimal.MinValue)
             .NotEqual(decimal.MaxValue)

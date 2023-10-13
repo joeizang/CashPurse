@@ -1,7 +1,7 @@
 ﻿using CashPurse.Server.BusinessLogic.EndpointFilters;
 using CashPurse.Server.BusinessLogic.EndpointHandlers;
 
-namespace CashPurse.Server;
+namespace CashPurse.Server.Endpoints;
 
 public static class BudgetListApiEndpoints
 {

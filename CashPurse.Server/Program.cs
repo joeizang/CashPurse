@@ -4,6 +4,8 @@ using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.Validators;
 using CashPurse.Server.Data;
 using CashPurse.Server.Endpoints;
+
+// using CashPurse.Server.Endpoints;
 using CashPurse.Server.Models;
 using CashPurse.Server.SwaggerConfig;
 using dotenv.net;
@@ -21,7 +23,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
-    options.UseSqlite("Data Source=../../appdb1.sqlite");
+    // options.UseSqlite("Data Source=../../appdb1.sqlite");
+    options.UseNpgsql(Environment.GetEnvironmentVariable("postgresconnectionstring")!);
 });
 builder.Services.AddOutputCache(options => {
     options.AddBasePolicy(b => b.Expire(TimeSpan.FromSeconds(12)));

@@ -31,7 +31,7 @@ public static class ExpenseEndpointHandler
     
     internal static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleCursorPagedGet(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
-        DateTime cursor)
+        DateOnly cursor)
     {
 
             var userId = principal?.Identity?.Name!;
@@ -62,7 +62,7 @@ public static class ExpenseEndpointHandler
 
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> 
         HandleGetCursorPagedExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
-        [FromServices] UserManager<ApplicationUser> userManager, DateTime cursor) // use ExpenseDate for cursor in query
+        [FromServices] UserManager<ApplicationUser> userManager, DateOnly cursor) // use ExpenseDate for cursor in query
     {
         var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
         var result = await ExpenseDataService

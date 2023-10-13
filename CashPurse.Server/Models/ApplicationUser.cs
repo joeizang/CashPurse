@@ -9,13 +9,13 @@ public class ApplicationUser : IdentityUser
     {
         Expenses = new List<Expense>();
         Incomes = new List<Income>();
-        CreatedAt = DateTime.UtcNow.ToLocalTime();
-        UpdatedAt = DateTime.UtcNow.ToLocalTime();
+        CreatedAt = DateOnly.FromDateTime(DateTime.Today);
+        UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
     }
 
-     public DateTime CreatedAt { get; set; }
+     public DateOnly CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    public DateOnly UpdatedAt { get; set; }
 
     public Currency PreferredCurrency { get; set; }
 

@@ -6,14 +6,14 @@ public class BaseEntity
 {
     public Guid Id { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateOnly CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    public DateOnly UpdatedAt { get; set; }
 
     public BaseEntity()
     {
         Id = Guid.NewGuid();
-        CreatedAt = DateTime.UtcNow.ToLocalTime();
-        UpdatedAt = DateTime.UtcNow.ToLocalTime();
+        CreatedAt = DateOnly.FromDateTime(DateTime.Today);
+        UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
     }
 }

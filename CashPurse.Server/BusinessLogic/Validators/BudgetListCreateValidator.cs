@@ -15,6 +15,10 @@ public class BudgetListCreateValidator : AbstractValidator<CreateBudgetListReque
             .WithMessage("Name is too long and won't be accepted");
         RuleFor(b => b.Description)
             .MaximumLength(500);
+        RuleFor(b => b.BudgetListOwnerId)
+            .NotEmpty()
+            .WithName(nameof(CreateBudgetListRequest.BudgetListOwnerId))
+            .WithMessage(b => $"'{b.BudgetListOwnerId}' cannot be empty!");
     }
 }
 

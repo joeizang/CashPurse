@@ -13,7 +13,7 @@ public static class BudgetListDataService
 {
 
     public static async Task<CursorPagedResult<List<BudgetListModel>>> GetCursorPagedUserBudgetLists(CashPurseDbContext _context,
-        Guid ownerExpenseId, DateTime cursor)
+        string ownerExpenseId, DateOnly cursor)
     {
         var results = new List<BudgetListModel>();
 
@@ -27,14 +27,23 @@ public static class BudgetListDataService
     }
     
     public static async Task<PagedResult<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context,
-        Guid ownerExpenseId)
+        string ownerId)
     {
-        var results = new List<BudgetListModel>();
+        // var results = new List<BudgetListModel>();
 
-        await foreach (var budgetList in CompiledQueries.GetUserBudgetLists(_context, ownerExpenseId))
-        {
-            results.Add(budgetList);
-        }
+        // await foreach (var budgetList in CompiledQueries.GetUserBudgetLists(_context, ownerId))
+        // {
+        //     results.Add(budgetList);
+        // }
+        var results = await _context.BudgetLists.AsNoTracking()
+                .OrderBy(b => b.CreatedAt)
+                .Where(b => b.OwnerId == ownerId)
+                .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
+                    b.ExpenseId.Value, b.CreatedAt,
+                    b.BudgetItems.Select(x => new BudgetListItemModel(
+                        x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
+                        x.Description, x.CreatedAt))))
+                .Take(7).ToListAsync(CancellationToken.None).ConfigureAwait(false);
 
         return new PagedResult<BudgetListModel>(results, results.Count, 
             1, 7, 
@@ -84,7 +93,7 @@ public static class BudgetListDataService
         target.UnitPrice = model.UnitPrice;
         target.Quantity = model.Quantity;
         target.CalculateItemPrice();
-        target.UpdatedAt = DateTime.UtcNow.ToLocalTime();
+        target.UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
         
         context.Entry(target).State = EntityState.Modified;
         await context.SaveChangesAsync().ConfigureAwait(false); 
@@ -107,7 +116,7 @@ public static class BudgetListDataService
     }
     
     public static async Task<CursorPagedResult<List<BudgetListItemModel>>> GetCursorPagedBudgetListItems(
-        CashPurseDbContext context, Guid budgetListId, DateTime cursor)
+        CashPurseDbContext context, Guid budgetListId, DateOnly cursor)
     {
         var results = new List<BudgetListItemModel>();
 

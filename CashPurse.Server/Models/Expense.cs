@@ -5,7 +5,7 @@ namespace CashPurse.Server.Models;
 public class Expense : BaseEntity
 {
     public required string Name { get; set; }
-    public DateTime ExpenseDate { get; set; }
+    public DateOnly ExpenseDate { get; set; }
 
     public string Description { get; set; } = string.Empty;
 
@@ -20,4 +20,13 @@ public class Expense : BaseEntity
     public required ExpenseType ExpenseType { get; set; }
 
     public required string ExpenseOwnerId { get; set; }
+
+    public ApplicationUser ExpenseOwner { get; set; } = default!;
+
+    public List<BudgetList> BudgetLists { get; set; }
+
+    public Expense()
+    {
+        BudgetLists = new();
+    }
 }

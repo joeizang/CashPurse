@@ -70,7 +70,7 @@ public static class ExpenseDataService
     }
 
     public static async Task<CursorPagedResult<List<ExpenseIndexModel>>> CursorPagedUserExpenses(CashPurseDbContext 
-            context, string userId, DateTime cursor)
+            context, string userId, DateOnly cursor)
     {
         var expenses = new List<ExpenseIndexModel>();
         await foreach (var each in CompiledQueries.GetCursorPagedUserExpensesAsync(context, 
@@ -79,7 +79,7 @@ public static class ExpenseDataService
             expenses.Add(each);
         }
 
-        if(expenses.Count == 0) return new CursorPagedResult<List<ExpenseIndexModel>>(DateTime.UtcNow.ToLocalTime(), 
+        if(expenses.Count == 0) return new CursorPagedResult<List<ExpenseIndexModel>>(DateOnly.FromDateTime(DateTime.Today), 
             expenses);
         return new CursorPagedResult<List<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
@@ -144,7 +144,7 @@ public static class ExpenseDataService
     }
 
     public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> CurrencyUsedCursorPagedFilteredExpenses(
-        CashPurseDbContext context, string userId, DateTime cursor
+        CashPurseDbContext context, string userId, DateOnly cursor
         )
     {
         var expenses = new List<ExpenseIndexModel>();

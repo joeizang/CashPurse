@@ -6,9 +6,13 @@ public class BudgetList : BaseEntity
 
     public string Description { get; set; } = string.Empty;
 
-    public required List<BudgetListItem> BudgetItems { get; set; } = new();
+    public List<BudgetListItem> BudgetItems { get; set; } = new();
 
-    public Guid OwnerExpenseId { get; set; }
+    public Guid? ExpenseId { get; set; }
 
-    public string OwnerId { get; set; } = string.Empty;
+    public Expense? Expense { get; set; }
+
+    public required string OwnerId { get; set; } = string.Empty;
+
+    public ApplicationUser Owner { get; set; } = default!;
 }

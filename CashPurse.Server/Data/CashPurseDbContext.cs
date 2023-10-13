@@ -37,11 +37,12 @@ public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<BudgetList>()
             .HasMany(b => b.BudgetItems)
             .WithOne();
-        // builder.Entity<BudgetList>()
-        //     .HasOne(b => b.Expense)
-        //     .WithMany(e => e.ExpenseBudget)
-        //     .IsRequired()
-        //     .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Expense>()
+            .HasMany(e => e.BudgetLists)
+            .WithOne(b => b.Expense)
+            .HasForeignKey(b => b.ExpenseId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<Expense>()
             .HasIndex(e => e.ExpenseDate);
@@ -51,6 +52,10 @@ public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
             .HasIndex(e => e.Amount);
         builder.Entity<BudgetList>()
             .HasIndex(b => b.CreatedAt);
+        builder.Entity<BudgetList>()
+            .HasIndex(b => b.OwnerId);
+        builder.Entity<BudgetList>()
+            .HasIndex(b => b.ExpenseId);
 
 
         base.OnModelCreating(builder);

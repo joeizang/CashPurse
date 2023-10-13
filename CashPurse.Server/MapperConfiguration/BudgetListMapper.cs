@@ -7,9 +7,10 @@ namespace CashPurse.Server.MapperConfiguration;
 [Mapper]
 public static partial class BudgetListMapper
 {
-    [MapProperty(nameof(CreateBudgetListRequest.Items), nameof(BudgetList.BudgetItems))]
     [MapProperty(nameof(CreateBudgetListRequest.Name), nameof(BudgetList.ListName))]
+    [MapProperty(nameof(CreateBudgetListRequest.BudgetListOwnerId), nameof(BudgetList.OwnerId))]
     public static partial BudgetList MapCreateBudgetList(this CreateBudgetListRequest budgetList);
 
+    [MapProperty(nameof(UpdateBudgetListRequest.BudgetListOwnerId), nameof(BudgetList.OwnerId))]
     public static partial BudgetList MapUpdateBudgetList(this UpdateBudgetListRequest budgetList);
 }

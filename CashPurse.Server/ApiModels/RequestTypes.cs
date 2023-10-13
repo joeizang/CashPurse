@@ -7,7 +7,7 @@ namespace CashPurse.Server.ApiModels;
 
 public class CursorPagedRequest : IParsable<CursorPagedRequest>
 {
-    public DateTime? Cursor { get; set; }
+    public DateOnly? Cursor { get; set; }
     public int? PageSize { get; set; }
 
     public static CursorPagedRequest Parse(string s, IFormatProvider? provider)
@@ -35,7 +35,7 @@ public class CursorPagedRequest : IParsable<CursorPagedRequest>
             return false;
         }
 
-        if (!DateTime.TryParse(parts[0], out var cursor))
+        if (!DateOnly.TryParse(parts[0], out var cursor))
         {
             return false;
         }
@@ -50,8 +50,8 @@ public class CursorPagedRequest : IParsable<CursorPagedRequest>
     }
 }
 
-public record CreateExpenseRequest(string Name, string Description, decimal Amount, DateTime ExpenseDate,
+public record CreateExpenseRequest(string Name, string Description, decimal Amount, DateOnly ExpenseDate,
     ExpenseType ExpenseType, Currency CurrencyUsed, string ExpenseOwnerId, string Notes);
 
-public record UpdateExpenseRequest(Guid ExpenseId, string Name, string Description, decimal Amount, DateTime ExpenseDate,
+public record UpdateExpenseRequest(Guid ExpenseId, string Name, string Description, decimal Amount, DateOnly ExpenseDate,
     ExpenseType ExpenseType, Currency CurrencyUsed, string ExpenseOwnerId, string Notes);
