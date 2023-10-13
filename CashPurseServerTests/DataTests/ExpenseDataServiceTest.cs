@@ -16,17 +16,6 @@ namespace CashPurseServerTests.DataTests
 {
     public class ExpenseDataServiceTest
     {
-        // private readonly IServiceScope _scope;
-        // public ExpenseDataServiceTest()
-        // {
-        //     var serviceCollection = new ServiceCollection();
-        //     serviceCollection.AddScoped<UserManager<ApplicationUser>>();
-
-        //     var provider = serviceCollection.BuildServiceProvider();
-        //     _scope = provider.CreateScope();
-            
-        // }
-
 
         [Fact]
         public async void CreateExpenseWithDataService_CreatesExpenseInDB()
@@ -46,7 +35,7 @@ namespace CashPurseServerTests.DataTests
             {
                 Name = "Buy a car for Ushim",
                 Description = "Bought a Toyota Camry for Ushim",
-                ExpenseDate = DateTime.Now,
+                ExpenseDate = DateOnly.FromDateTime(DateTime.Today),
                 Amount = 30000000,
                 CurrencyUsed = Currency.NGN,
                 ExpenseType = ExpenseType.Transportation,
@@ -77,7 +66,7 @@ namespace CashPurseServerTests.DataTests
             {
                 Name = "Buy a car for Ushim",
                 Description = "Bought a Toyota Camry for Ushim",
-                ExpenseDate = DateTime.Now,
+                ExpenseDate = DateOnly.FromDateTime(DateTime.Today),
                 Amount = 30000000,
                 CurrencyUsed = Currency.NGN,
                 ExpenseType = ExpenseType.Transportation,
