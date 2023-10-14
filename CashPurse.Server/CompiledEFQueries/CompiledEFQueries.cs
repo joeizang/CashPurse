@@ -167,7 +167,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.OwnerId == userId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.ExpenseId.Value, b.CreatedAt,
+                                b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
                                     x.Description, x.CreatedAt))))
@@ -183,7 +183,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Where(b => b.OwnerId == userId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.ExpenseId.Value, b.CreatedAt,
+                                b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => 
                                     new BudgetListItemModel(x.Id, x.Description,
                                         x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
@@ -199,7 +199,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Where(b => b.ExpenseId == expenseId)
                             // .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                                b.ExpenseId.Value, b.CreatedAt,
+                                b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Name, x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
                             .Take(7)

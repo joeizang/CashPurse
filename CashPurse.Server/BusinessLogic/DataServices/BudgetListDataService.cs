@@ -39,7 +39,7 @@ public static class BudgetListDataService
                 .OrderBy(b => b.CreatedAt)
                 .Where(b => b.OwnerId == ownerId)
                 .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                    b.ExpenseId.Value, b.CreatedAt,
+                    b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                     b.BudgetItems.Select(x => new BudgetListItemModel(
                         x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
                         x.Description, x.CreatedAt))))
