@@ -229,6 +229,20 @@ namespace CashPurse.Server.CompiledEFQueries
                                 b.Description, b.CreatedAt))
                             .Take(7)
                 );
+        
+        public static readonly Func<CashPurseDbContext, Guid, BudgetListModel>
+            GetBudgetListById =
+                EF.CompileQuery(
+                    (CashPurseDbContext context, Guid id) =>
+                        context.BudgetLists.AsNoTracking()
+                            .Where(b => b.Id == id)
+                            .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
+                                b.ExpenseId ?? Guid.Empty, b.CreatedAt,
+                                b.BudgetItems.Select(x => new BudgetListItemModel(
+                                    x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
+                                    x.Description, x.CreatedAt))))
+                            .Single()
+                );
 
         public static readonly Func<CashPurseDbContext, Guid, IEnumerable<BudgetList>>
             GetUserBudgetListsForCount =

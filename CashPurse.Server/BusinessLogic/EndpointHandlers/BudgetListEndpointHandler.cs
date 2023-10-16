@@ -44,6 +44,13 @@ public static class BudgetListEndpointHandler
             .ConfigureAwait(false);
         return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
+    
+    public static Ok<BudgetListModel> HandleGetById(ClaimsPrincipal principal,
+        [FromServices] CashPurseDbContext context, [FromRoute] Guid budgetListId)
+    {
+        var result = BudgetListDataService.GetBudgetListById(budgetListId, context);
+        return TypedResults.Ok(result);
+    }
 
     public static async Task<Created> CreateBudgetList(ClaimsPrincipal principal,
         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
@@ -95,9 +102,10 @@ public static class BudgetListEndpointHandler
     }
 
     public static async Task<Created> CreateBudgetListItem([FromServices] CashPurseDbContext context,
-        Guid budgetListId, [FromBody] CreateBudgetListItemRequest inputModel)
+       [FromRoute] Guid budgetListId, [FromBody] CreateBudgetListItemRequest inputModel)
     {
         var item = BudgetListItemMapper.MapCreateBudgetListItemRequest(inputModel);
+        item.BudgetListId = budgetListId;
         await BudgetListDataService.AddNewBudgetListItem(context, item);
         return TypedResults.Created();
     }

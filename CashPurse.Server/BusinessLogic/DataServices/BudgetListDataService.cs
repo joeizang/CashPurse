@@ -50,6 +50,12 @@ public static class BudgetListDataService
             (int)Math.Ceiling(results.Count / (double)7), 1,
             7 < (int)Math.Ceiling(results.Count / (double)7));
     }
+    
+    public static BudgetListModel GetBudgetListById(Guid id, CashPurseDbContext _context)
+    {
+        var result = CompiledQueries.GetBudgetListById(_context, id) ?? throw new BudgetListOrItemNotFound("Budget list not found.");
+        return result;
+    }
 
     public static int CountBudgetListItems(CashPurseDbContext _context, Guid id)
     {
