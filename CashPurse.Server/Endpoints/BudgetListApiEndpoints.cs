@@ -26,11 +26,8 @@ public static class BudgetListApiEndpoints
             .AddEndpointFilter<UpdateBudgetListFilter>();
         
         budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems);
-        // budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem)
-        budgetListItemGroup.MapPost("", () => {
-            return Results.Ok("Done!");
-        });
-            // .AddEndpointFilter<CreateBudgetListItemFilter>();
+        budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem)
+            .AddEndpointFilter<CreateBudgetListItemFilter>();
 
         budgetListItemGroup.MapPut("/{id:Guid}", BudgetListEndpointHandler.UpdateBudgetListItem)
             .AddEndpointFilter<UpdateBudgetListItemFilter>();
