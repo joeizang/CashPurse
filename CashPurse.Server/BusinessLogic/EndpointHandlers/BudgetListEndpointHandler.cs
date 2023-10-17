@@ -46,7 +46,7 @@ public static class BudgetListEndpointHandler
     }
     
     public static Ok<BudgetListModel> HandleGetById(ClaimsPrincipal principal,
-        [FromServices] CashPurseDbContext context, [FromRoute] Guid budgetListId)
+        [FromServices] CashPurseDbContext context, Guid budgetListId)
     {
         var result = BudgetListDataService.GetBudgetListById(budgetListId, context);
         return TypedResults.Ok(result);
@@ -110,8 +110,8 @@ public static class BudgetListEndpointHandler
         return TypedResults.Created();
     }
     
-    public static async Task<NoContent> UpdateBudgetListItem([FromServices] CashPurseDbContext context,
-        [FromBody] UpdateBudgetListItemRequest inputModel)
+    public static async Task<NoContent> UpdateBudgetListItem([FromServices] CashPurseDbContext context, Guid budgetListId,
+        Guid budgetListItemId, [FromBody] UpdateBudgetListItemRequest inputModel)
     {
         await BudgetListDataService.UpdateBudgetListItem(context, inputModel).ConfigureAwait(false);
         return TypedResults.NoContent();

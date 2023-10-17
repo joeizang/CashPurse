@@ -13,7 +13,7 @@ public static class ExpenseApiEndpoints
 
     public static RouteGroupBuilder MapExpenseEndpoints(this IEndpointRouteBuilder app)
     {
-        var expenseGroup = app.MapGroup("/api/expenses");//.RequireAuthorization();
+        var expenseGroup = app.MapGroup("/api/expenses").RequireAuthorization();
         var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
 
         expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet)

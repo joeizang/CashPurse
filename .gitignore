@@ -376,3 +376,5 @@ CashPurse.Server/cashpursedb.sqlite-shm
 .DS_Store
 .idea/.idea.CashPurse/.idea/dataSources.xml
 .idea/.idea.CashPurse/.idea/dataSources.xml
+.vscode/launch.json
+.idea/.idea.CashPurse/.idea/dataSources.xml

@@ -86,6 +86,7 @@ public static class BudgetListDataService
 
     public static async Task AddNewBudgetListItem(CashPurseDbContext context, BudgetListItem entity)
     {
+        entity.CalculateItemPrice();
         context.BudgetListItems.Add(entity);
         await context.SaveChangesAsync().ConfigureAwait(false);
     }
