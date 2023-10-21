@@ -16,5 +16,12 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/../appdb1.sqlite</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="cashpurseapidb@localhost" uuid="80fd6795-6487-4ce5-93f8-3ef15134bbcb">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/cashpurseapidb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

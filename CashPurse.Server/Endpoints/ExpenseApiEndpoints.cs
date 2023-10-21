@@ -1,9 +1,6 @@
 ﻿using CashPurse.Server.ApiModels;
 using CashPurse.Server.BusinessLogic.EndpointFilters;
 using CashPurse.Server.BusinessLogic.EndpointHandlers;
-using CashPurse.Server.BusinessLogic.Validators;
-using CashPurse.Server.CompiledEFQueries;
-using CashPurse.Server.Models;
 
 namespace CashPurse.Server.Endpoints;
 

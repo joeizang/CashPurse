@@ -104,9 +104,9 @@ namespace CashPurse.Server.CompiledEFQueries
                 EF.CompileAsyncQuery(
                     (CashPurseDbContext context, int skipValue, string userId) =>
                         context.Expenses.AsNoTracking()
+                            .Where(e => e.ExpenseOwnerId == userId)
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
                             .Skip(skipValue)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
