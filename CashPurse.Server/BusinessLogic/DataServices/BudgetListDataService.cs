@@ -42,7 +42,7 @@ public static class BudgetListDataService
                     b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                     b.BudgetItems.Select(x => new BudgetListItemModel(
                         x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
-                        x.Description, x.CreatedAt))))
+                        x.Description, x.CreatedAt, b.Id))))
                 .Take(7).ToListAsync(CancellationToken.None).ConfigureAwait(false);
 
         return new PagedResult<BudgetListModel>(results, results.Count, 
@@ -133,5 +133,11 @@ public static class BudgetListDataService
         }
 
         return new CursorPagedResult<List<BudgetListItemModel>>(results[^1].CreatedAt, results);
+    }
+
+    public static BudgetListItemModel GetBudgetListItemById(CashPurseDbContext context, Guid budgetListId, Guid id)
+    {
+        var result = CompiledQueries.GetBudgetListItemById(context, budgetListId, id);
+        return result ?? throw new BudgetListOrItemNotFound("Item not found.");
     }
 }

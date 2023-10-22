@@ -9,8 +9,7 @@ public class FetchBudgetListItemsFilter : IEndpointFilter
     {
         var id = context.GetArgument<Guid>(1);
         var db = context.GetArgument<CashPurseDbContext>(0);
-        var result = await db.BudgetLists.CountAsync(x => x.Id == id).ConfigureAwait(false);
-        return result == 0 ? Results.Problem("Invalid BudgetList Id", statusCode: 400) 
+        return id == Guid.Empty ? Results.Problem("Invalid BudgetList Id", statusCode: 400) 
             : await next(context);
     }
 }

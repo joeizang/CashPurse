@@ -101,6 +101,13 @@ public static class BudgetListEndpointHandler
         return results;
     }
 
+    public static Ok<BudgetListItemModel> HandleGetBudgetListItemById(
+        [FromServices] CashPurseDbContext context, Guid budgetListId, Guid budgetListItemId)
+    {
+        var result = BudgetListDataService.GetBudgetListItemById(context, budgetListId, budgetListItemId);
+        return TypedResults.Ok(result);
+    }
+
     public static async Task<Created> CreateBudgetListItem([FromServices] CashPurseDbContext context,
        [FromRoute] Guid budgetListId, [FromBody] CreateBudgetListItemRequest inputModel)
     {

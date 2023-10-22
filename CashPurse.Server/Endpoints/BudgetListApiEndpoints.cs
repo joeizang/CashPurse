@@ -1,5 +1,6 @@
 ﻿using CashPurse.Server.BusinessLogic.EndpointFilters;
 using CashPurse.Server.BusinessLogic.EndpointHandlers;
+using CashPurse.Server.Models;
 
 namespace CashPurse.Server.Endpoints;
 
@@ -12,12 +13,14 @@ public static class BudgetListApiEndpoints
         var budgetListItemGroup = budgetListGroupWithIds.MapGroup("/budgetListItem");
         var budgetListItemGroupWithIds = budgetListItemGroup.MapGroup("/{budgetListItemId:guid}");
 
-        budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet);
+        budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet)
+        .CacheOutput("CacheDataPage");
 
         budgetListGroup.MapGet("/cursor", BudgetListEndpointHandler.HandleCursorPagedGet);
 
         budgetListGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetById)
-            .AddEndpointFilter<GetBudgetListByIdFilter>();
+            .AddEndpointFilter<GetBudgetListByIdFilter>()
+            .CacheOutput("CacheDataPage");
         
         budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList)
             .AddEndpointFilter<CreateBudgetListFilter>();
@@ -26,12 +29,17 @@ public static class BudgetListApiEndpoints
             .AddEndpointFilter<UpdateBudgetListFilter>();
 
         budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems)
-            .AddEndpointFilter<FetchBudgetListItemsFilter>();
+            .AddEndpointFilter<FetchBudgetListItemsFilter>()
+            .CacheOutput("CacheDataPage");
+        budgetListItemGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItemById)
+            .AddEndpointFilter<GetBudgetListItemByIdFilter>()
+            .CacheOutput("CacheDataPage");
         budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem)
             .AddEndpointFilter<CreateBudgetListItemFilter>();
 
         budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem)
-            .AddEndpointFilter<UpdateBudgetListItemFilter>();
+            .AddEndpointFilter<UpdateBudgetListItemFilter>()
+            .CacheOutput("CacheDataPage");
 
         return budgetListGroup;
     }

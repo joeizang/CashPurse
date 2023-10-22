@@ -10,8 +10,7 @@ public class GetBudgetListByIdFilter : IEndpointFilter
     {
         var id = context.GetArgument<Guid>(2);
         var db = context.GetArgument<CashPurseDbContext>(1);
-        var exists = await db.BudgetLists.AsNoTracking().CountAsync(x => x.Id == id).ConfigureAwait(false);
-        if(id == Guid.Empty || exists == 0)
+        if(id == Guid.Empty)
             return Results.NotFound("Budget list not found.");
         return await next(context).ConfigureAwait(false);
     }

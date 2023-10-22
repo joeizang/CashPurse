@@ -170,7 +170,7 @@ namespace CashPurse.Server.CompiledEFQueries
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
-                                    x.Description, x.CreatedAt))))
+                                    x.Description, x.CreatedAt, b.Id))))
                             .Take(7)
                 );
 
@@ -186,7 +186,7 @@ namespace CashPurse.Server.CompiledEFQueries
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => 
                                     new BudgetListItemModel(x.Id, x.Description,
-                                        x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
+                                        x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt, b.Id))))
                             .Take(7)
                 );
         
@@ -201,7 +201,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
-                                    x.Id, x.Name, x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt))))
+                                    x.Id, x.Name, x.Quantity, x.Price, x.UnitPrice, x.Description, x.CreatedAt, b.Id))))
                             .Take(7)
                 );
         
@@ -213,7 +213,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .OrderBy(b => b.CreatedAt)
                             .Where(b => b.BudgetListId == budgetListId)
                             .Select(b => new BudgetListItemModel(b.Id, b.Description, b.Quantity, b.Price, b.UnitPrice,
-                                b.Description, b.CreatedAt))
+                                b.Description, b.CreatedAt, b.BudgetListId))
                             .Take(7)
                 );
         
@@ -226,7 +226,7 @@ namespace CashPurse.Server.CompiledEFQueries
                             .Where(b => b.BudgetListId == budgetListId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListItemModel(b.Id, b.Description, b.Quantity, b.Price, b.UnitPrice,
-                                b.Description, b.CreatedAt))
+                                b.Description, b.CreatedAt, b.BudgetListId))
                             .Take(7)
                 );
         
@@ -240,7 +240,7 @@ namespace CashPurse.Server.CompiledEFQueries
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
                                     x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
-                                    x.Description, x.CreatedAt))))
+                                    x.Description, x.CreatedAt, b.Id))))
                             .Single()
                 );
 
@@ -251,6 +251,17 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.BudgetLists
                             .AsNoTracking()
                             .Where(b => b.ExpenseId == id)
+                );
+        public static readonly Func<CashPurseDbContext, Guid, Guid, BudgetListItemModel>
+            GetBudgetListItemById =
+                EF.CompileQuery(
+                    (CashPurseDbContext context, Guid budgetListId, Guid id) =>
+                        context.BudgetListItems.AsNoTracking()
+                            .Where(b => b.BudgetListId == budgetListId)
+                            .Where(b => b.Id == id)
+                            .Select(b => new BudgetListItemModel(b.Id, b.Description, b.Quantity, b.Price, b.UnitPrice,
+                                b.Description, b.CreatedAt, b.BudgetListId))
+                            .Single()
                 );
     }
 }

@@ -21,8 +21,7 @@ public class UpdateBudgetListItemFilter(IValidator<UpdateBudgetListItemRequest> 
     {
         var db = context.GetArgument<CashPurseDbContext>(0);
         var budgetListItemId = context.GetArgument<Guid>(2);
-        var budgetListItem = await db.BudgetListItems.FindAsync(budgetListItemId).ConfigureAwait(false);
-        if(budgetListItem is null) return Results.NotFound("The budget list item was not found.");
+        if(budgetListItemId == Guid.Empty) return Results.NotFound("The budget list item was not found.");
         var item = context.GetArgument<UpdateBudgetListItemRequest>(3);
         var result = await validator.ValidateAsync(item).ConfigureAwait(false);
         return result.IsValid == false ? Results.ValidationProblem(result.ToDictionary()) : await next(context);
