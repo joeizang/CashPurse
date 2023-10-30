@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CashPurse.Server.Data;
 
-public class CashPurseDbContext : IdentityDbContext<ApplicationUser>
+public class CashPurseDbContext : DbContext//IdentityDbContext<ApplicationUser>
 {
     public CashPurseDbContext(DbContextOptions<CashPurseDbContext> options)
         : base(options)

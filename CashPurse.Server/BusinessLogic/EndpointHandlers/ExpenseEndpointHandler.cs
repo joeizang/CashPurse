@@ -12,14 +12,15 @@ namespace CashPurse.Server.BusinessLogic.EndpointHandlers;
 
 public static class ExpenseEndpointHandler
 {
-    internal static async Task<Ok<PagedResult<ExpenseIndexModel>>> HandleGet(ClaimsPrincipal principal,
-        [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager)
+    internal static async Task<Ok<PagedResult<ExpenseIndexModel>>> HandleGet(//ClaimsPrincipal principal,
+        [FromServices] CashPurseDbContext context)
     {
         try
         {
-            var userId = principal?.Identity?.Name!;
-            var user = await userManager.FindByEmailAsync(userId).ConfigureAwait(false);
-            var alternative = await ExpenseDataService.GetUserExpenses(context, user!.Id)
+            // var userId = principal?.Identity?.Name!;
+            // var user = await userManager.FindByEmailAsync(userId).ConfigureAwait(false);
+            var user = new ApplicationUser();
+            var alternative = await ExpenseDataService.GetUserExpenses(context)
                 .ConfigureAwait(false);
             return TypedResults.Ok(alternative!);
         }
@@ -29,13 +30,14 @@ public static class ExpenseEndpointHandler
         }
     }
     
-    internal static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleCursorPagedGet(ClaimsPrincipal principal,
-        [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
+    internal static async Task<Ok<CursorPagedResult<List<ExpenseIndexModel>>>> HandleCursorPagedGet(//ClaimsPrincipal principal,
+        [FromServices] CashPurseDbContext context, //[FromServices] UserManager<ApplicationUser> userManager,
         DateOnly cursor)
     {
 
-            var userId = principal?.Identity?.Name!;
-            var user = await userManager.FindByEmailAsync(userId).ConfigureAwait(false);
+            // var userId = principal?.Identity?.Name!;
+            // var user = await userManager.FindByEmailAsync(userId).ConfigureAwait(false);
+            var user = new ApplicationUser();
             var alternative = await ExpenseDataService.CursorPagedUserExpenses(context,
                     user!.Id, cursor)
                 .ConfigureAwait(false);
@@ -43,14 +45,15 @@ public static class ExpenseEndpointHandler
 
     }
 
-    internal static async Task<Ok<ExpenseIndexModel>> HandleGetById(ClaimsPrincipal principal,
-         [FromServices] CashPurseDbContext context, [FromServices] UserManager<ApplicationUser> userManager,
+    internal static async Task<Ok<ExpenseIndexModel>> HandleGetById(//ClaimsPrincipal principal,
+         [FromServices] CashPurseDbContext context, //[FromServices] UserManager<ApplicationUser> userManager,
         Guid expenseId)
     {
         try
         {
-            var userId = principal?.Identity?.Name!;
-            var user = await userManager.FindByNameAsync(userId).ConfigureAwait(false);
+            // var userId = principal?.Identity?.Name!;
+            // var user = await userManager.FindByNameAsync(userId).ConfigureAwait(false);
+            var user = new ApplicationUser();
             var expense = ExpenseDataService.GetUserExpenseById(context, user?.Id!, expenseId);
             return TypedResults.Ok(expense!);
         }
@@ -61,10 +64,11 @@ public static class ExpenseEndpointHandler
     }
 
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> 
-        HandleGetCursorPagedExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
-        [FromServices] UserManager<ApplicationUser> userManager, DateOnly cursor) // use ExpenseDate for cursor in query
+        HandleGetCursorPagedExpensesByCurrency(//ClaimsPrincipal principal, 
+            [FromServices] CashPurseDbContext context, DateOnly cursor) // use ExpenseDate for cursor in query
     {
-        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        // var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var user = new ApplicationUser();
         var result = await ExpenseDataService
             .CurrencyUsedCursorPagedFilteredExpenses(context, user?.Id!, cursor)
             .ConfigureAwait(false);
@@ -72,20 +76,23 @@ public static class ExpenseEndpointHandler
     }
     
     internal static async Task<Ok<PagedResult<ExpenseIndexModel>>> 
-        HandleGetExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
-            [FromServices] UserManager<ApplicationUser> userManager) // use ExpenseDate for cursor in query
+        HandleGetExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context)
+            // [FromServices] UserManager<ApplicationUser> userManager) // use ExpenseDate for cursor in query
     {
-        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        // var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var user = new ApplicationUser();
         var result = await ExpenseDataService.GetCurrencyUsedFilteredExpenses(context, user?.Id!, 1)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
 
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpenseByExpenseType(
-        ClaimsPrincipal principal, [FromServices] UserManager<ApplicationUser> userManager,
+        //ClaimsPrincipal principal, 
+        [FromServices] UserManager<ApplicationUser> userManager,
         [FromServices] CashPurseDbContext context, CursorPagedRequest cursor)
     {
-        var user = await GetCurrentUser(principal, userManager).ConfigureAwait (false);
+        // var user = await GetCurrentUser(principal, userManager).ConfigureAwait (false);
+        var user = new ApplicationUser();
         var result = await ExpenseDataService.GetCursorPagedTypeFilteredExpenses(context, user?.Id!, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
@@ -97,16 +104,19 @@ public static class ExpenseEndpointHandler
         return userManager.FindByNameAsync(userId!);
     }
 
-    internal static async Task<Created> HandleCreateExpense(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
+    internal static async Task<Created> HandleCreateExpense(//ClaimsPrincipal principal,
+        [FromServices] CashPurseDbContext context,
         [FromServices] UserManager<ApplicationUser> userManager, [FromBody] CreateExpenseRequest request)
     {
-        var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        // var user = await GetCurrentUser(principal, userManager).ConfigureAwait(false);
+        var user = new ApplicationUser();
         var expense = ExpenseMapper.MapToCreateExpense(request);
         await ExpenseDataService.AddNewExpense(context, expense).ConfigureAwait(false);
         return TypedResults.Created();
     }
 
-    internal static async Task<NoContent> HandleUpdateExpense(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context,
+    internal static async Task<NoContent> HandleUpdateExpense(//ClaimsPrincipal principal, 
+        [FromServices] CashPurseDbContext context,
         [FromServices] UserManager<ApplicationUser> userManager, [FromBody] UpdateExpenseRequest request,
         [FromRoute] Guid expenseId)
     {

@@ -26,8 +26,7 @@ public static class BudgetListDataService
         return new CursorPagedResult<List<BudgetListModel>>(results[^1].CreatedAt, results);
     }
     
-    public static async Task<PagedResult<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context,
-        string ownerId)
+    public static async Task<PagedResult<BudgetListModel>> GetUserBudgetLists(CashPurseDbContext _context)
     {
         // var results = new List<BudgetListModel>();
 
@@ -37,7 +36,7 @@ public static class BudgetListDataService
         // }
         var results = await _context.BudgetLists.AsNoTracking()
                 .OrderBy(b => b.CreatedAt)
-                .Where(b => b.OwnerId == ownerId)
+                // .Where(b => b.OwnerId == ownerId)
                 .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                     b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                     b.BudgetItems.Select(x => new BudgetListItemModel(

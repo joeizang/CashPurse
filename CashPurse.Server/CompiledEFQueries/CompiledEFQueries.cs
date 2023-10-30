@@ -9,12 +9,12 @@ namespace CashPurse.Server.CompiledEFQueries
 {
     public static class CompiledQueries
     {
-        public static readonly Func<CashPurseDbContext, string, int>
+        public static readonly Func<CashPurseDbContext, int>
        GetNnumberOfUserExpensesAsync =
            EF.CompileQuery(
-               (CashPurseDbContext context, string userId) =>
+               (CashPurseDbContext context) =>
                    context.Expenses
-                       .AsNoTracking().Count(e => e.ExpenseOwnerId == userId));
+                       .AsNoTracking().Count());
 
         public static readonly Func<CashPurseDbContext, string, Guid, ExpenseIndexModel>
             GetExpenseById =
@@ -27,15 +27,15 @@ namespace CashPurse.Server.CompiledEFQueries
                         .Single());
 
 
-        public static readonly Func<CashPurseDbContext, string, IAsyncEnumerable<ExpenseIndexModel>>
+        public static readonly Func<CashPurseDbContext, string?, IAsyncEnumerable<ExpenseIndexModel>>
             GetUserExpensesAsync =
                 EF.CompileAsyncQuery(
-                    (CashPurseDbContext context, string userId) =>
+                    (CashPurseDbContext context, string? userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
-                                e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
+                                e.CurrencyUsed, e.ExpenseType, e.Notes!, userId ?? ""))
                             .Take(7));
 
         public static readonly Func<CashPurseDbContext, string, DateOnly, IAsyncEnumerable<ExpenseIndexModel>>

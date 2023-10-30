@@ -49,17 +49,16 @@ public static class ExpenseDataService
     }
     public static int TotalExpenses { get; set; }
 
-    public static int TotalCount(CashPurseDbContext context, string userId)
+    public static int TotalCount(CashPurseDbContext context, string? userId = "")
     {
-        return CompiledQueries.GetNnumberOfUserExpensesAsync(context, userId);
+        return CompiledQueries.GetNnumberOfUserExpensesAsync(context);
     }
 
-    public static async Task<PagedResult<ExpenseIndexModel>> GetUserExpenses(CashPurseDbContext context,
-        string userId, int pageNumber = 1)
+    public static async Task<PagedResult<ExpenseIndexModel>> GetUserExpenses(CashPurseDbContext context, int pageNumber = 1)
     {
         var expenses = new List<ExpenseIndexModel>();
-        TotalExpenses = TotalCount(context, userId);
-        await foreach (var each in CompiledQueries.GetUserExpensesAsync(context, userId))
+        TotalExpenses = TotalCount(context);
+        await foreach (var each in CompiledQueries.GetUserExpensesAsync(context, ""))
         {
             expenses.Add(each);
         }

@@ -9,11 +9,9 @@ namespace CashPurse.Server.BusinessLogic.Validators;
 
 public class ExpenseValidator : AbstractValidator<CreateExpenseRequest>
 {
-    private readonly UserManager<ApplicationUser> _userManager;
 
-    public ExpenseValidator(UserManager<ApplicationUser> userManager)
+    public ExpenseValidator()
     {
-        _userManager = userManager;
         RuleFor(e => e.Name)
             .MaximumLength(255)
             .NotEmpty()

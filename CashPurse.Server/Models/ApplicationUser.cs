@@ -3,7 +3,7 @@ using NodaTime;
 
 namespace CashPurse.Server.Models;
 
-public class ApplicationUser : IdentityUser
+public class ApplicationUser //: IdentityUser
 {
     public ApplicationUser()
     {
@@ -11,7 +11,10 @@ public class ApplicationUser : IdentityUser
         Incomes = new List<Income>();
         CreatedAt = DateOnly.FromDateTime(DateTime.Today);
         UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
+        Id = Guid.NewGuid().ToString();
     }
+
+    public string Id { get; set; }
 
      public DateOnly CreatedAt { get; set; }
 
