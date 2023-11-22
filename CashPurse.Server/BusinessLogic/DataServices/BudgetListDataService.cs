@@ -50,9 +50,9 @@ public static class BudgetListDataService
             7 < (int)Math.Ceiling(results.Count / (double)7));
     }
     
-    public static BudgetListModel GetBudgetListById(Guid id, CashPurseDbContext _context)
+    public static BudgetListModel BudgetListById(Guid id, CashPurseDbContext context)
     {
-        var result = CompiledQueries.GetBudgetListById(_context, id) ?? throw new BudgetListOrItemNotFound("Budget list not found.");
+        var result = CompiledQueries.GetBudgetListById(context, id) ?? throw new BudgetListOrItemNotFound("Budget list not found.");
         return result;
     }
 

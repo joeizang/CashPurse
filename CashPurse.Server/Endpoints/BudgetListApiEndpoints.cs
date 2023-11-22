@@ -12,30 +12,31 @@ public static class BudgetListApiEndpoints
     {
         var budgetListGroup = app.MapGroup("/api/budgetlists");//.RequireAuthorization();
         var budgetListGroupWithIds = budgetListGroup.MapGroup("/{budgetListId:guid}");
-
-        budgetListGroup.MapGet("", async (CashPurseDbContext context) =>
-        {
-            var result = await BudgetListDataService.GetUserBudgetLists(context).ConfigureAwait(false);
-            return Results.Ok(result);
-        });
         // var budgetListItemGroup = budgetListGroupWithIds.MapGroup("/budgetListItem");
         // var budgetListItemGroupWithIds = budgetListItemGroup.MapGroup("/{budgetListItemId:guid}");
-        //
-        // // budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet)
+
+        // budgetListGroup.MapGet("", async (CashPurseDbContext context) =>
+        // {
+        //     var result = await BudgetListDataService.GetUserBudgetLists(context).ConfigureAwait(false);
+        //     return Results.Ok(result);
+        // });
+
+        budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet)
+            .CacheOutput("CacheDataPage");
+        budgetListGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetById)
+            .CacheOutput("CacheDataPage");
+        budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList);
         // //     .AllowAnonymous()
-        // // .CacheOutput("CacheDataPage")
         // //     .RequireCors("AllowAll");
         //
         // budgetListGroup.MapGet("/cursor", BudgetListEndpointHandler.HandleCursorPagedGet)
         //     .CacheOutput("CacheDataPage")
         //     .RequireCors("AllowAll");
         //
-        // budgetListGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetById)
+        
         //     // .AddEndpointFilter<GetBudgetListByIdFilter>()
-        //     .CacheOutput("CacheDataPage")
         //     .RequireCors("AllowAll");
         //
-        // budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList)
         //     // .AddEndpointFilter<CreateBudgetListFilter>()
         //     .RequireCors("AllowAll");
         //
