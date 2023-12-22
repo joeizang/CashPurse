@@ -11,6 +11,8 @@ public class BaseEntity
 
     public DateOnly UpdatedAt { get; set; }
 
+    public uint Version { get; set; }
+
     public BaseEntity()
     {
         Id = Guid.NewGuid();

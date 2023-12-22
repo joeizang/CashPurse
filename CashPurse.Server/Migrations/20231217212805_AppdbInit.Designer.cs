@@ -3,6 +3,7 @@ using System;
 using CashPurse.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CashPurse.Server.Migrations
 {
     [DbContext(typeof(CashPurseDbContext))]
-    partial class CashPurseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231217212805_AppdbInit")]
+    partial class AppdbInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,12 +47,6 @@ namespace CashPurse.Server.Migrations
 
                     b.Property<DateOnly>("UpdatedAt")
                         .HasColumnType("date");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -93,12 +90,6 @@ namespace CashPurse.Server.Migrations
 
                     b.Property<DateOnly>("UpdatedAt")
                         .HasColumnType("date");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -146,12 +137,6 @@ namespace CashPurse.Server.Migrations
                     b.Property<DateOnly>("UpdatedAt")
                         .HasColumnType("date");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Amount");
@@ -182,12 +167,6 @@ namespace CashPurse.Server.Migrations
 
                     b.Property<DateOnly>("UpdatedAt")
                         .HasColumnType("date");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

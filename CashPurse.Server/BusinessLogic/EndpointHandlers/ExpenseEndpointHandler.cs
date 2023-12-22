@@ -17,7 +17,7 @@ public static class ExpenseEndpointHandler
         try
         {
             var user = new ApplicationUser();
-            var alternative = await ExpenseDataService.GetUserExpenses(context)
+            var alternative = await ExpenseDataService.UserExpenses(context)
                 .ConfigureAwait(false);
             return TypedResults.Ok(alternative!);
         }
@@ -38,13 +38,13 @@ public static class ExpenseEndpointHandler
 
     }
 
-    internal static async Task<Ok<ExpenseIndexModel>> HandleGetById(
+    internal static Ok<ExpenseIndexModel> HandleGetById(
         [FromServices] CashPurseDbContext context, Guid expenseId)
     {
         try
         {
             var user = new ApplicationUser();
-            var expense = ExpenseDataService.GetUserExpenseById(context, user?.Id!, expenseId);
+            var expense = ExpenseDataService.UserExpenseById(context, user?.Id!, expenseId);
             return TypedResults.Ok(expense!);
         }
         catch (Exception )
@@ -67,7 +67,7 @@ public static class ExpenseEndpointHandler
         HandleGetExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context)
     {
         var user = new ApplicationUser();
-        var result = await ExpenseDataService.GetCurrencyUsedFilteredExpenses(context, user?.Id!, 1)
+        var result = await ExpenseDataService.CurrencyUsedFilteredExpenses(context, user?.Id!, 1)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
@@ -76,7 +76,7 @@ public static class ExpenseEndpointHandler
         [FromServices] CashPurseDbContext context, CursorPagedRequest cursor)
     {
         var user = new ApplicationUser();
-        var result = await ExpenseDataService.GetCursorPagedTypeFilteredExpenses(context, user?.Id!, cursor)
+        var result = await ExpenseDataService.CursorPagedTypeFilteredExpenses(context, user?.Id!, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }

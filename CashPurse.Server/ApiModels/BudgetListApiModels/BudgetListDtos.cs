@@ -15,7 +15,7 @@ public record BudgetListModel(Guid ListId, string Name, string Description, Guid
 public record BudgetListIndexModel(Guid ListId, string Name, string Description, string OwnerId, int ItemCount,
     IEnumerable<BudgetListItemModel> Items);
 
-public record CreateBudgetListRequest(string Name, string Description, string BudgetListOwnerId);
+public record CreateBudgetListRequest(string Name, string Description);
 
-public record UpdateBudgetListRequest(string ListName, string Description, string ExpenseId,
-    IEnumerable<BudgetListItemModel> BudgetItems, Guid BudgetListId, string BudgetListOwnerId);
+public record UpdateBudgetListRequest(string ListName, string? Description, string? ExpenseId,
+    IEnumerable<BudgetListItemModel> BudgetItems, Guid BudgetListId, string? BudgetListOwnerId);

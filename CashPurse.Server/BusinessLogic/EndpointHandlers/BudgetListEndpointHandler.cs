@@ -25,9 +25,9 @@ public static class BudgetListEndpointHandler
     {
         var user = new ApplicationUser();
         var expense = await context.Expenses.AsNoTracking()
-            .Where(x => x.ExpenseOwnerId == user!.Id)
+            // .Where(x => x.ExpenseOwnerId == user!.Id)
             .ToArrayAsync(CancellationToken.None);
-        var alternative = await BudgetListDataService.GetUserBudgetLists(context)
+        var alternative = await BudgetListDataService.UserBudgetLists(context)
             .ConfigureAwait(false);
         return TypedResults.Ok(alternative?.Items.Count == 0 ? alternative : alternative!);
     }
@@ -36,9 +36,9 @@ public static class BudgetListEndpointHandler
         [FromServices] CashPurseDbContext context, DateOnly cursor)
     {
         var user = new ApplicationUser();
-        var expense = context.Expenses.AsNoTracking().First(x => x.ExpenseOwnerId == user!.Id);
+        var expense = context.Expenses.AsNoTracking();//.First(x => x.ExpenseOwnerId == user!.Id);
         var alternative = await BudgetListDataService
-            .GetCursorPagedUserBudgetLists(context, user!.Id, cursor)
+            .CursorPagedUserBudgetLists(context, user!.Id, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
@@ -56,7 +56,7 @@ public static class BudgetListEndpointHandler
         {
             var budgetList = BudgetListMapper.MapCreateBudgetList(inputModel);
             // var user = new ApplicationUser();
-            budgetList.OwnerId = inputModel.BudgetListOwnerId;
+            // budgetList.OwnerId = inputModel.BudgetListOwnerId;
             await BudgetListDataService.AddNewBudgetList(context, budgetList).ConfigureAwait(false);
             return Results.Created($"budgetlists/{budgetList.Id}", budgetList);
         }
@@ -67,14 +67,40 @@ public static class BudgetListEndpointHandler
         }
     }
 
+    private static readonly Func<Guid, CashPurseDbContext, Task<BudgetList?>> 
+        FetchBudgetListById = async (id, context) =>
+    {
+        return await context.BudgetLists.FindAsync(id).ConfigureAwait(false);
+    };
+    
+    private static readonly Func<UpdateBudgetListRequest, BudgetList, BudgetList> MapUpdateBudgetList = 
+        (inputModel, entity) =>
+        {
+            entity.ListName = inputModel.ListName;
+            entity.Description = inputModel.Description;
+            entity.ExpenseId = Guid.Parse(inputModel.ExpenseId);
+            return entity;
+        };
+    private static readonly Func<UpdateBudgetListRequest, CashPurseDbContext, Task<List<BudgetListItem>>> 
+        MapUpdateBudgetListItem = async (inputModel, context) =>
+        {
+            return await context.BudgetListItems
+                .Where(b => b.BudgetListId == inputModel.BudgetListId)
+                .ToListAsync(CancellationToken.None)
+                .ConfigureAwait(false);
+        };
     public static async Task<NoContent> UpdateBudgetList(
-        [FromServices] CashPurseDbContext context,
+        [FromServices] CashPurseDbContext context, Guid budgetListId,
         [FromBody]UpdateBudgetListRequest inputModel
     ) 
     {
-        var budgetList = BudgetListMapper.MapUpdateBudgetList(inputModel);
-        var user = new ApplicationUser();
-        budgetList.OwnerId = user!.Id; //clean up update budget list
+        var tempList = await FetchBudgetListById(budgetListId, context).ConfigureAwait(false);
+        var budgetList = MapUpdateBudgetList(inputModel, tempList!);
+        var budgetListItems = await MapUpdateBudgetListItem(inputModel, context).ConfigureAwait(false);
+        budgetList.BudgetItems = budgetListItems;
+        
+        // var user = new ApplicationUser();
+        // budgetList.OwnerId = user!.Id; //clean up update budget list
         await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
@@ -83,7 +109,7 @@ public static class BudgetListEndpointHandler
         [FromServices] CashPurseDbContext context, Guid budgetListId)
     {
         var results = await BudgetListDataService
-            .GetBudgetListItems(context, budgetListId).ConfigureAwait(false);
+            .BudgetListItems(context, budgetListId).ConfigureAwait(false);
         return results;
     }
     
@@ -91,7 +117,7 @@ public static class BudgetListEndpointHandler
         [FromServices] CashPurseDbContext context, Guid budgetListId, DateOnly cursor)
     {
         var results = await BudgetListDataService
-            .GetCursorPagedBudgetListItems(context, budgetListId, cursor)
+            .CursorPagedBudgetListItems(context, budgetListId, cursor)
             .ConfigureAwait(false);
         return results;
     }
@@ -99,7 +125,7 @@ public static class BudgetListEndpointHandler
     public static Ok<BudgetListItemModel> HandleGetBudgetListItemById(
         [FromServices] CashPurseDbContext context, Guid budgetListId, Guid budgetListItemId)
     {
-        var result = BudgetListDataService.GetBudgetListItemById(context, budgetListId, budgetListItemId);
+        var result = BudgetListDataService.BudgetListItemById(context, budgetListId, budgetListItemId);
         return TypedResults.Ok(result);
     }
 

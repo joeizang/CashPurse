@@ -73,7 +73,7 @@ app.MapGet("/api/health", () => Results.Ok("Healthy! :D"));
 
 app.MapGet("/api/budgetListings", async (CashPurseDbContext context) =>
 {
-    var result = await BudgetListDataService.GetUserBudgetLists(context).ConfigureAwait(false);
+    var result = await BudgetListDataService.UserBudgetLists(context).ConfigureAwait(false);
     return Results.Ok(result);
 });
 

@@ -63,9 +63,9 @@ public class CreateExpenseInputModel
     [Display(Name = "Expense Date")]
     public DateOnly ExpenseDate { get; set; }
 
-    [Required]
-    [Display(Name = "Expense Owner")]
-    public string ExpenseOwnerId { get; set; } = default!;
+    // [Required]
+    // [Display(Name = "Expense Owner")]
+    // public string ExpenseOwnerId { get; set; } = default!;
 }
 
 public record ExpenseIndexModel(string ExpenseName, string ExpenseDescription, decimal ExpenseAmount,

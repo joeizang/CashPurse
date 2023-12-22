@@ -34,6 +34,19 @@ public class CashPurseDbContext : DbContext//IdentityDbContext<ApplicationUser>
             .Property(b => b.Price)
             .HasPrecision(18, 2);
 
+        builder.Entity<Expense>()
+            .Property(e => e.Version)
+            .IsRowVersion();
+        builder.Entity<BudgetList>()
+            .Property(e => e.Version)
+            .IsRowVersion();
+        builder.Entity<BudgetListItem>()
+            .Property(e => e.Version)
+            .IsRowVersion();
+        builder.Entity<Income>()
+            .Property(e => e.Version)
+            .IsRowVersion();
+
         builder.Entity<BudgetList>()
             .HasMany(b => b.BudgetItems)
             .WithOne();
@@ -46,14 +59,14 @@ public class CashPurseDbContext : DbContext//IdentityDbContext<ApplicationUser>
 
         builder.Entity<Expense>()
             .HasIndex(e => e.ExpenseDate);
-        builder.Entity<Expense>()
-            .HasIndex(e => e.ExpenseOwnerId);
+        // builder.Entity<Expense>()
+        //     .HasIndex(e => e.ExpenseOwnerId);
         builder.Entity<Expense>()
             .HasIndex(e => e.Amount);
         builder.Entity<BudgetList>()
             .HasIndex(b => b.CreatedAt);
-        builder.Entity<BudgetList>()
-            .HasIndex(b => b.OwnerId);
+        // builder.Entity<BudgetList>()
+        //     .HasIndex(b => b.OwnerId);
         builder.Entity<BudgetList>()
             .HasIndex(b => b.ExpenseId);
 

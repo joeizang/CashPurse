@@ -40,7 +40,7 @@ public static class BudgetListApiEndpoints
         //     // .AddEndpointFilter<CreateBudgetListFilter>()
         //     .RequireCors("AllowAll");
         //
-        // budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList)
+        budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList);
         //     // .AddEndpointFilter<UpdateBudgetListFilter>()
         //     .RequireCors("AllowAll");
         //

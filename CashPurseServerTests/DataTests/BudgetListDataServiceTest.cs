@@ -24,7 +24,7 @@ public class BudgetListDataServiceTest
         {
             ListName = "10th Year anniversary party budget",
             Description = "planning for a party for our anniversary",
-            OwnerId = userId,
+            // OwnerId = userId,
             BudgetItems = new()
         };
 
@@ -49,7 +49,7 @@ public class BudgetListDataServiceTest
         {
             ListName = "10th Year anniversary party budget",
             Description = "planning for a party for our anniversary",
-            OwnerId = userId,
+            // OwnerId = userId,
             BudgetItems = new()
         };
 
@@ -89,7 +89,7 @@ public class BudgetListDataServiceTest
         {
             ListName = "10th Year anniversary party budget",
             Description = "planning for a party for our anniversary",
-            OwnerId = userId,
+            // OwnerId = userId,
             BudgetItems = new()
         };
 
@@ -146,7 +146,7 @@ public class BudgetListDataServiceTest
         {
             ListName = "10th Year anniversary party budget",
             Description = "planning for a party for our anniversary",
-            OwnerId = userId,
+            // OwnerId = userId,
             BudgetItems = new()
         };
 
@@ -176,7 +176,7 @@ public class BudgetListDataServiceTest
         budgetListToUpdate.BudgetItems.Single().Quantity = 2;
 
         await BudgetListDataService.UpdateBudgetList(context, budgetListToUpdate).ConfigureAwait(false);
-        var ans = await BudgetListDataService.GetUserBudgetLists(context);
+        var ans = await BudgetListDataService.UserBudgetLists(context);
         Assert.NotEmpty(context.BudgetLists.ToList());
         Assert.Equal(1, context.BudgetLists.Count());
         Assert.Collection(ans.Items);

@@ -2,7 +2,7 @@
 
 public class BudgetList : BaseEntity
 {
-    public required string ListName { get; set; }
+    public required string ListName { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;
 
@@ -12,7 +12,7 @@ public class BudgetList : BaseEntity
 
     public Expense? Expense { get; set; }
 
-    public required string OwnerId { get; set; } = string.Empty;
-
-    public ApplicationUser Owner { get; set; } = default!;
+    // public required string OwnerId { get; set; } = string.Empty;
+    //
+    // public ApplicationUser Owner { get; set; } = default!;
 }

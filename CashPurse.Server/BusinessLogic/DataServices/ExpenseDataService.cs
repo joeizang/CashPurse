@@ -24,7 +24,7 @@ public static class ExpenseDataService
             entity.ExpenseDate = req.ExpenseDate;
             entity.Name = req.Name;
             entity.Amount = req.Amount;
-            entity.ExpenseOwnerId = req.ExpenseOwnerId;
+            // entity.ExpenseOwnerId = req.ExpenseOwnerId;
             entity.CurrencyUsed = req.CurrencyUsed;
             entity.Description = req.Description;
             entity.Notes = req.Notes;
@@ -54,7 +54,7 @@ public static class ExpenseDataService
         return CompiledQueries.GetNnumberOfUserExpensesAsync(context);
     }
 
-    public static async Task<PagedResult<ExpenseIndexModel>> GetUserExpenses(CashPurseDbContext context, int pageNumber = 1)
+    public static async Task<PagedResult<ExpenseIndexModel>> UserExpenses(CashPurseDbContext context, int pageNumber = 1)
     {
         var expenses = new List<ExpenseIndexModel>();
         TotalExpenses = TotalCount(context);
@@ -83,13 +83,13 @@ public static class ExpenseDataService
         return new CursorPagedResult<List<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
 
-    public static ExpenseIndexModel GetUserExpenseById(CashPurseDbContext context, string userId, Guid expenseId)
+    public static ExpenseIndexModel UserExpenseById(CashPurseDbContext context, string userId, Guid expenseId)
     {
         var result = CompiledQueries.GetExpenseById(context, userId, expenseId);
         return result;
     }
 
-    public static async Task<PagedResult<ExpenseIndexModel>> GetExpenseTypeFilteredExpenses(CashPurseDbContext context,
+    public static async Task<PagedResult<ExpenseIndexModel>> ExpenseTypeFilteredExpenses(CashPurseDbContext context,
         string userId, int pageNumber)
     {
         var expenses = new List<ExpenseIndexModel>();
@@ -104,7 +104,7 @@ public static class ExpenseDataService
                 pageNumber < (int)Math.Ceiling(TotalExpenses / (double)7), pageNumber > 1);
     }
 
-    public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> GetCursorPagedTypeFilteredExpenses(
+    public static async Task<CursorPagedResult<IEnumerable<ExpenseIndexModel>>> CursorPagedTypeFilteredExpenses(
         CashPurseDbContext context,
         string userId, CursorPagedRequest cursor)
     {
@@ -126,7 +126,7 @@ public static class ExpenseDataService
         }
     }
 
-    public static async Task<PagedResult<ExpenseIndexModel>> GetCurrencyUsedFilteredExpenses(CashPurseDbContext context,
+    public static async Task<PagedResult<ExpenseIndexModel>> CurrencyUsedFilteredExpenses(CashPurseDbContext context,
         string userId, int pageNumber)
     {
         var expenses = new List<ExpenseIndexModel>();
@@ -156,7 +156,7 @@ public static class ExpenseDataService
         return new CursorPagedResult<IEnumerable<ExpenseIndexModel>>(expenses[^1].ExpenseDate, expenses);
     }
 
-    public static decimal GetExpenseTotalForLastMonth(CashPurseDbContext context, string userId)
+    public static decimal ExpenseTotalForLastMonth(CashPurseDbContext context, string userId)
     {
         var result = CompiledQueries.GetExpenseTotalForLast30DaysAsync(context, userId);
         var actualTotal = 0m;
@@ -164,7 +164,7 @@ public static class ExpenseDataService
         {
             actualTotal += each.CurrencyUsed switch
             {
-                Currency.USD => each.Amount * 799,
+                Currency.USD => each.Amount * 1100,
                 Currency.EUR => each.Amount * 1046,
                 Currency.GBP => each.Amount * 1222,
                 _ => each.Amount
@@ -173,12 +173,11 @@ public static class ExpenseDataService
         return actualTotal;
     }
 
-    public static async Task<decimal> GetMeanSpendByDays(CashPurseDbContext _context, string userId, int days)
+    public static async Task<decimal> MeanSpendByDays(CashPurseDbContext context, string userId, int days)
     {
         var result = 0m;
-        var counter = 0;
         await foreach (var item in CompiledQueries.GetMeanSpendOverSpecifiedPeriod(
-                           _context, userId, days))
+                           context, userId, days))
         {
             var temp = item.CurrencyUsed switch
             {
@@ -188,7 +187,6 @@ public static class ExpenseDataService
                 _ => item.Amount
             };
             result += temp;
-            counter++;
         }
         return result;
     }

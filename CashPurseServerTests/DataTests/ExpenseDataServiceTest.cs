@@ -39,7 +39,7 @@ namespace CashPurseServerTests.DataTests
                 Amount = 30000000,
                 CurrencyUsed = Currency.NGN,
                 ExpenseType = ExpenseType.Transportation,
-                ExpenseOwnerId = userId,
+                // ExpenseOwnerId = userId,
                 Id = Guid.NewGuid()
             };
             //Act
@@ -70,7 +70,7 @@ namespace CashPurseServerTests.DataTests
                 Amount = 30000000,
                 CurrencyUsed = Currency.NGN,
                 ExpenseType = ExpenseType.Transportation,
-                ExpenseOwnerId = userId,
+                // ExpenseOwnerId = userId,
                 Id = Guid.NewGuid()
             };
             //Act
@@ -80,7 +80,7 @@ namespace CashPurseServerTests.DataTests
                 .ConfigureAwait(false);
             var updateModel = new UpdateExpenseRequest(expenseupdate.Id, "Buy a car for Ushim My Love",
                 expenseupdate.Description, expenseupdate.Amount, expenseupdate.ExpenseDate, expenseupdate.ExpenseType,
-                expenseupdate.CurrencyUsed, expenseupdate.ExpenseOwnerId, expenseupdate.Notes);
+                expenseupdate.CurrencyUsed, /*expenseupdate.ExpenseOwnerId,*/ expenseupdate.Notes);
             expenseupdate.Name = "Buy a car for Ushim My Love";
             await ExpenseDataService.UpdateExpense(db, expenseupdate, updateModel).ConfigureAwait(false);
             //Assert

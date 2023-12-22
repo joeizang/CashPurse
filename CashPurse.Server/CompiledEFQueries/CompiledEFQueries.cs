@@ -21,7 +21,7 @@ namespace CashPurse.Server.CompiledEFQueries
                 EF.CompileQuery((CashPurseDbContext context, string userId, Guid expenseId) => 
                         context.Expenses.AsNoTracking()
                         .Where(e => e.Id.Equals(expenseId))
-                        .Where(e => e.ExpenseOwnerId.Equals(userId))
+                        // .Where(e => e.ExpenseOwnerId.Equals(userId))
                         .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                         .Single());
@@ -44,7 +44,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId, DateOnly cursor) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= cursor)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
@@ -56,7 +56,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
@@ -68,7 +68,7 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseType)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= cursor)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
@@ -81,7 +81,7 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseType)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
@@ -93,7 +93,7 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.ExpenseType)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Skip(skipValue)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
@@ -104,7 +104,7 @@ namespace CashPurse.Server.CompiledEFQueries
                 EF.CompileAsyncQuery(
                     (CashPurseDbContext context, int skipValue, string userId) =>
                         context.Expenses.AsNoTracking()
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
                             .Skip(skipValue)
@@ -119,7 +119,7 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= cursor)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
@@ -132,7 +132,7 @@ namespace CashPurse.Server.CompiledEFQueries
                         context.Expenses.AsNoTracking()
                             .OrderBy(e => e.CurrencyUsed)
                             .ThenBy(e => e.ExpenseDate)
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Select(e => new ExpenseIndexModel(e.Name, e.Description, e.Amount, e.ExpenseDate, e.Id,
                                 e.CurrencyUsed, e.ExpenseType, e.Notes!, userId))
                             .Take(7));
@@ -142,7 +142,7 @@ namespace CashPurse.Server.CompiledEFQueries
                 EF.CompileQuery(
                     (CashPurseDbContext context, string userId) =>
                         context.Expenses.AsNoTracking()
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= DateOnly.FromDateTime(DateTime.Now.ToLocalTime().AddDays(-30)))
                             .Select(e => new ExpenseDashBoardSummary(e.Amount, e.CurrencyUsed))
                             .Take(30));
@@ -152,7 +152,7 @@ namespace CashPurse.Server.CompiledEFQueries
                 EF.CompileAsyncQuery(
                     (CashPurseDbContext context, string userId, int days) =>
                         context.Expenses.AsNoTracking()
-                            .Where(e => e.ExpenseOwnerId == userId)
+                            // .Where(e => e.ExpenseOwnerId == userId)
                             .Where(e => e.ExpenseDate >= DateOnly.FromDateTime(DateTime.Now.ToLocalTime().AddDays(-days)))
                             .GroupBy(e => e.CurrencyUsed)
                             .Select(e => 
@@ -165,7 +165,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.OwnerId == userId)
+                            // .Where(b => b.OwnerId == userId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(
@@ -180,7 +180,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, DateOnly cursor, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderBy(b => b.CreatedAt)
-                            .Where(b => b.OwnerId == userId)
+                            // .Where(b => b.OwnerId == userId)
                             .Where(b => b.CreatedAt >= cursor)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
                                 b.ExpenseId ?? Guid.Empty, b.CreatedAt,

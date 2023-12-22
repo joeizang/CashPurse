@@ -8,7 +8,7 @@ public class Income : BaseEntity
 
     public string? Notes { get; set; } = string.Empty;
 
-    public ApplicationUser IncomeOwner { get; set; } = default!;
-
-    public required string IncomeOwnerId { get; set; } = string.Empty;
+    // public ApplicationUser IncomeOwner { get; set; } = default!;
+    //
+    // public required string IncomeOwnerId { get; set; } = string.Empty;
 }

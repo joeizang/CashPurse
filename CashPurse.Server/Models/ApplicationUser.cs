@@ -7,14 +7,14 @@ public class ApplicationUser //: IdentityUser
 {
     public ApplicationUser()
     {
-        Expenses = new List<Expense>();
-        Incomes = new List<Income>();
-        CreatedAt = DateOnly.FromDateTime(DateTime.Today);
-        UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
-        Id = Guid.NewGuid().ToString();
+        // Expenses = new List<Expense>();
+        // Incomes = new List<Income>();
+        // CreatedAt = DateOnly.FromDateTime(DateTime.Today);
+        // UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
+        // Id = Guid.NewGuid().ToString();
     }
 
-    public string Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
      public DateOnly CreatedAt { get; set; }
 
@@ -23,8 +23,8 @@ public class ApplicationUser //: IdentityUser
     public Currency PreferredCurrency { get; set; }
 
     public string FullName { get; set; } = string.Empty;
-
-    public List<Expense> Expenses { get; set; } = null!;
-
-    public List<Income> Incomes { get; set; } = null!;
+    //
+    // public List<Expense> Expenses { get; set; } = null!;
+    //
+    // public List<Income> Incomes { get; set; } = null!;
 }
