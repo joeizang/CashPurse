@@ -43,7 +43,7 @@ namespace CashPurseServerTests.DataTests
                 Id = Guid.NewGuid()
             };
             //Act
-            await ExpenseDataService.AddNewExpense(db, expense).ConfigureAwait(false);
+            await ExpenseDataService.AddNewExpense(db, expense, TODO).ConfigureAwait(false);
             //Assert
             Assert.NotEmpty(db.Expenses.ToList());
         }
@@ -74,7 +74,7 @@ namespace CashPurseServerTests.DataTests
                 Id = Guid.NewGuid()
             };
             //Act
-            await ExpenseDataService.AddNewExpense(db, expense).ConfigureAwait(false);
+            await ExpenseDataService.AddNewExpense(db, expense, TODO).ConfigureAwait(false);
             var expenseupdate = await db.Expenses.Where(x => x.Amount == 30000000)
                 .SingleAsync()
                 .ConfigureAwait(false);
