@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Security.Principal;
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.DataServices;
@@ -12,9 +13,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CashPurse.Server.BusinessLogic.EndpointHandlers;
 
+// TODO: configure and use ILogger to log all exceptions and other successful operations
+
 public static class BudgetListEndpointHandler
 {
-    private static Task<ApplicationUser?> GetCurrentUser(ClaimsPrincipal principal, 
+    private static Task<ApplicationUser?> GetCurrentUser(IPrincipal principal, 
         UserManager<ApplicationUser> userManager)
     {
         var userId = principal?.Identity?.Name;
@@ -43,10 +46,17 @@ public static class BudgetListEndpointHandler
         return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
     
-    public static Ok<BudgetListModel> HandleGetById([FromServices] CashPurseDbContext context, Guid budgetListId)
+    public static async Task<IResult> HandleGetById([FromServices] CashPurseDbContext context, Guid budgetListId)
     {
-        var result = BudgetListDataService.BudgetListById(budgetListId, context);
-        return TypedResults.Ok(result);
+        try
+        {
+            var result = await BudgetListDataService.BudgetListById(budgetListId, context);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem("There was a problem but the problem ain't yours!");
+        }
     }
 
     public static async Task<IResult> CreateBudgetList(
@@ -62,8 +72,7 @@ public static class BudgetListEndpointHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return Results.Problem("There was a problem but the problem ain't yours!");
         }
     }
 
@@ -78,7 +87,6 @@ public static class BudgetListEndpointHandler
         {
             entity.ListName = inputModel.ListName;
             entity.Description = inputModel.Description;
-            entity.ExpenseId = Guid.Parse(inputModel.ExpenseId);
             return entity;
         };
     private static readonly Func<UpdateBudgetListRequest, CashPurseDbContext, Task<List<BudgetListItem>>> 
@@ -98,9 +106,6 @@ public static class BudgetListEndpointHandler
         var budgetList = MapUpdateBudgetList(inputModel, tempList!);
         var budgetListItems = await MapUpdateBudgetListItem(inputModel, context).ConfigureAwait(false);
         budgetList.BudgetItems = budgetListItems;
-        
-        // var user = new ApplicationUser();
-        // budgetList.OwnerId = user!.Id; //clean up update budget list
         await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
         return TypedResults.NoContent();
     }

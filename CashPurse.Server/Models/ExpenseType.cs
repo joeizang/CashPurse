@@ -23,5 +23,6 @@ public enum ExpenseType
     Rental,
     Subscriptions,
     Groceries,
-    KidsExpenses
+    KidsExpenses,
+    CareerInvestment
 }

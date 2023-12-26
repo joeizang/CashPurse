@@ -1,5 +1,6 @@
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
+using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.BusinessLogic.Exceptions;
 using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
@@ -37,11 +38,10 @@ public static class BudgetListDataService
         var results = await context.BudgetLists.AsNoTracking()
                 .OrderBy(b => b.CreatedAt)
                 // .Where(b => b.OwnerId == ownerId)
-                .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description,
-                    b.ExpenseId ?? Guid.Empty, b.CreatedAt,
+                .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description, b.CreatedAt,
                     b.BudgetItems.Select(x => new BudgetListItemModel(
                         x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
-                        x.Description, x.CreatedAt, b.Id))))
+                        x.Description, x.CreatedAt, b.Id)), new List<ExpenseIndexModel>()))
                 .Take(7).ToListAsync(CancellationToken.None).ConfigureAwait(false);
 
         return new PagedResult<BudgetListModel>(results, results.Count, 
@@ -50,11 +50,13 @@ public static class BudgetListDataService
             7 < (int)Math.Ceiling(results.Count / (double)7));
     }
     
-    public static BudgetListModel BudgetListById(Guid id, CashPurseDbContext context)
+    public static async Task<BudgetListModel> BudgetListById(Guid id, CashPurseDbContext context)
     {
-        var result = CompiledQueries.GetBudgetListById(context, id) ?? 
+        var budgetResult = CompiledQueries.GetBudgetListById(context, id) ?? 
                      throw new BudgetListOrItemNotFound("Budget list not found.");
-        return result;
+        var expenseQuery = CompiledQueries.GetExpenseByBudgetId(context, id);
+        budgetResult!.Expenses.AddRange(expenseQuery);
+        return budgetResult;
     }
 
     public static int CountBudgetListItems(CashPurseDbContext context, Guid id)
@@ -67,8 +69,19 @@ public static class BudgetListDataService
 
     public static async Task AddNewBudgetList(CashPurseDbContext context,BudgetList entity)
     {
-        context.BudgetLists.Add(entity);
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        await context.Database.BeginTransactionAsync().ConfigureAwait(false);
+        try
+        {
+            context.BudgetLists.Add(entity);
+            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            await context.Database.RollbackTransactionAsync().ConfigureAwait(false);
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public static async Task<bool> UpdateBudgetList(CashPurseDbContext context, BudgetList entity)

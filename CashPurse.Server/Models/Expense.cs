@@ -23,7 +23,7 @@ public class Expense : BaseEntity
     //
     // public ApplicationUser ExpenseOwner { get; set; } = default!;
 
-    public List<BudgetList> BudgetLists { get; set; } = [];
+    public Guid? ListId { get; set; } = Guid.Empty;
 
     public Expense()
     {

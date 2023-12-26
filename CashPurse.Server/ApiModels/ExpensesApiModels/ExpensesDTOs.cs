@@ -69,7 +69,8 @@ public class CreateExpenseInputModel
 }
 
 public record ExpenseIndexModel(string ExpenseName, string ExpenseDescription, decimal ExpenseAmount,
-    DateOnly ExpenseDate, Guid Id, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes, string ExpenseOwnerEmail);
+    DateOnly ExpenseDate, Guid Id, Guid BudgetId, Currency CurrencyUsed, ExpenseType ExpenseType, string ExpenseNotes, 
+    string ExpenseOwnerEmail);
 
 public record ExpenseUpdateModel(string ExpenseName, string ExpenseDescription, decimal Amount, DateOnly ExpenseDate,
     Guid ExpenseId, Currency CurrencyUsed, ExpenseType ExpenseType, string Notes, string ExpenseOwnerEmail);

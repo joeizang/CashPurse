@@ -10,15 +10,28 @@ namespace CashPurse.Server.BusinessLogic.DataServices;
 public static class ExpenseDataService
 {
 
-    public static async Task AddNewExpense(CashPurseDbContext context, Expense entity)
+    public static async Task AddNewExpense(CashPurseDbContext context, Expense entity,
+        CancellationToken token = default)
     {
-        entity.ExpenseDate = entity.ExpenseDate;
-        context.Expenses.Add(entity);
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        await context.Database.BeginTransactionAsync(token);
+        try
+        {
+            context.Expenses.Add(entity);
+            await context.SaveChangesAsync(token).ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync(token);
+        }
+        catch (Exception e)
+        {
+            await context.Database.RollbackTransactionAsync(token);
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    public static async Task<bool> UpdateExpense(CashPurseDbContext context, Expense entity, UpdateExpenseRequest req)
+    public static async Task<bool> UpdateExpense(CashPurseDbContext context, Expense entity, UpdateExpenseRequest req,
+        CancellationToken token = default)
     {
+        await context.Database.BeginTransactionAsync(token);
         try
         {
             entity.ExpenseDate = req.ExpenseDate;
@@ -30,12 +43,15 @@ public static class ExpenseDataService
             entity.Notes = req.Notes;
             entity.ExpenseType = req.ExpenseType;
             entity.Id = req.ExpenseId;
+            entity.ListId = req.BudgetListId;
             context.Entry(entity).State = EntityState.Modified;
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.SaveChangesAsync(token).ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync(token);
             return true;
         }
         catch (Exception e)
         {
+            await context.Database.RollbackTransactionAsync(token);
             Console.WriteLine(e);
             throw;
         }
@@ -51,7 +67,7 @@ public static class ExpenseDataService
 
     public static int TotalCount(CashPurseDbContext context, string? userId = "")
     {
-        return CompiledQueries.GetNnumberOfUserExpensesAsync(context);
+        return CompiledQueries.GetNumberOfUserExpensesAsync(context);
     }
 
     public static async Task<PagedResult<ExpenseIndexModel>> UserExpenses(CashPurseDbContext context, int pageNumber = 1)

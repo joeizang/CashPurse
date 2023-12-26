@@ -88,21 +88,43 @@ public static class ExpenseEndpointHandler
     }
 
     internal static async Task<Created> HandleCreateExpense(
-        [FromServices] CashPurseDbContext context, [FromBody] CreateExpenseRequest request)
+        [FromServices] CashPurseDbContext context, [FromBody] CreateExpenseRequest request,
+        CancellationToken token = default)
     {
         var user = new ApplicationUser();
-        var expense = ExpenseMapper.MapToCreateExpense(request);
-        await ExpenseDataService.AddNewExpense(context, expense).ConfigureAwait(false);
+        // var expense = ExpenseMapper.MapToExpense(request);
+        var expense = new Expense
+        {
+            Name = request.Name,
+            Description = request.Description,
+            Amount = request.Amount,
+            ExpenseDate = request.ExpenseDate,
+            ExpenseType = request.ExpenseType,
+            CurrencyUsed = request.CurrencyUsed,
+            Notes = request.Notes
+        };
+
+        await ExpenseDataService.AddNewExpense(context, expense, token).ConfigureAwait(false);
         return TypedResults.Created();
     }
 
+    private static Func<Guid, CashPurseDbContext, Task<Expense?>> FetchExpenseById = async (id, context) => 
+        await context.Expenses.FindAsync(id).ConfigureAwait(false);
     internal static async Task<NoContent> HandleUpdateExpense( 
         [FromServices] CashPurseDbContext context, [FromBody] UpdateExpenseRequest request,
-        [FromRoute] Guid expenseId)
+        [FromRoute] Guid expenseId, CancellationToken token = default)
     {
-        var target = await context.Expenses.FindAsync(expenseId).ConfigureAwait(false);
-        await ExpenseDataService.UpdateExpense(context, target!, request).ConfigureAwait(false);
-        return TypedResults.NoContent();
+        try
+        {
+            var target = await FetchExpenseById(expenseId, context).ConfigureAwait(false);
+            await ExpenseDataService.UpdateExpense(context, target!, request, token).ConfigureAwait(false);
+            return TypedResults.NoContent();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     // internal static Task HandleDeleteExpense(HttpContext context)

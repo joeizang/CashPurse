@@ -1,3 +1,4 @@
+using CashPurse.Server.ApiModels.ExpensesApiModels;
 using NodaTime;
 
 namespace CashPurse.Server.ApiModels.BudgetListApiModels;
@@ -9,8 +10,8 @@ public record CreateBudgetListItemRequest(string ListName, double Quantity, deci
 public record UpdateBudgetListItemRequest(Guid ItemId, string Name, double Quantity, decimal Price, 
     decimal UnitPrice, string Description, Guid BudgetListId);
 
-public record BudgetListModel(Guid ListId, string Name, string Description, Guid OwnerExpenseId, DateOnly CreatedAt,
-    IEnumerable<BudgetListItemModel> BudgetItems);
+public record BudgetListModel(Guid ListId, string Name, string Description, DateOnly CreatedAt,
+    IEnumerable<BudgetListItemModel> BudgetItems, List<ExpenseIndexModel> Expenses);
 
 public record BudgetListIndexModel(Guid ListId, string Name, string Description, string OwnerId, int ItemCount,
     IEnumerable<BudgetListItemModel> Items);

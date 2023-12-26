@@ -35,9 +35,6 @@ namespace CashPurse.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ExpenseId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("ListName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -54,8 +51,6 @@ namespace CashPurse.Server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("ExpenseId");
 
                     b.ToTable("BudgetLists");
                 });
@@ -117,6 +112,9 @@ namespace CashPurse.Server.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
+                    b.Property<Guid?>("BudgetListId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateOnly>("CreatedAt")
                         .HasColumnType("date");
 
@@ -132,6 +130,9 @@ namespace CashPurse.Server.Migrations
 
                     b.Property<int>("ExpenseType")
                         .HasColumnType("integer");
+
+                    b.Property<Guid?>("ListId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -156,7 +157,11 @@ namespace CashPurse.Server.Migrations
 
                     b.HasIndex("Amount");
 
+                    b.HasIndex("BudgetListId");
+
                     b.HasIndex("ExpenseDate");
+
+                    b.HasIndex("ListId");
 
                     b.ToTable("Expenses");
                 });
@@ -194,16 +199,6 @@ namespace CashPurse.Server.Migrations
                     b.ToTable("Incomes");
                 });
 
-            modelBuilder.Entity("CashPurse.Server.Models.BudgetList", b =>
-                {
-                    b.HasOne("CashPurse.Server.Models.Expense", "Expense")
-                        .WithMany("BudgetLists")
-                        .HasForeignKey("ExpenseId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Expense");
-                });
-
             modelBuilder.Entity("CashPurse.Server.Models.BudgetListItem", b =>
                 {
                     b.HasOne("CashPurse.Server.Models.BudgetList", null)
@@ -213,14 +208,18 @@ namespace CashPurse.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CashPurse.Server.Models.Expense", b =>
+                {
+                    b.HasOne("CashPurse.Server.Models.BudgetList", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("BudgetListId");
+                });
+
             modelBuilder.Entity("CashPurse.Server.Models.BudgetList", b =>
                 {
                     b.Navigation("BudgetItems");
-                });
 
-            modelBuilder.Entity("CashPurse.Server.Models.Expense", b =>
-                {
-                    b.Navigation("BudgetLists");
+                    b.Navigation("Expenses");
                 });
 #pragma warning restore 612, 618
         }

@@ -51,7 +51,7 @@ public class CursorPagedRequest : IParsable<CursorPagedRequest>
 }
 
 public record CreateExpenseRequest(string Name, string Description, decimal Amount, DateOnly ExpenseDate,
-    ExpenseType ExpenseType, Currency CurrencyUsed, string ExpenseOwnerId, string Notes);
+    ExpenseType ExpenseType, Currency CurrencyUsed, string Notes, Guid? BudgetListId);
 
 public record UpdateExpenseRequest(Guid ExpenseId, string Name, string Description, decimal Amount, DateOnly ExpenseDate,
-    ExpenseType ExpenseType, Currency CurrencyUsed, /*string ExpenseOwnerId,*/ string Notes);
+    ExpenseType ExpenseType, Currency CurrencyUsed, Guid? BudgetListId, /*string ExpenseOwnerId,*/ string Notes);

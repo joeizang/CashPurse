@@ -1,5 +1,4 @@
 ﻿using CashPurse.Server.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CashPurse.Server.Data;
@@ -50,12 +49,6 @@ public class CashPurseDbContext : DbContext//IdentityDbContext<ApplicationUser>
         builder.Entity<BudgetList>()
             .HasMany(b => b.BudgetItems)
             .WithOne();
-        builder.Entity<Expense>()
-            .HasMany(e => e.BudgetLists)
-            .WithOne(b => b.Expense)
-            .HasForeignKey(b => b.ExpenseId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<Expense>()
             .HasIndex(e => e.ExpenseDate);
@@ -67,8 +60,8 @@ public class CashPurseDbContext : DbContext//IdentityDbContext<ApplicationUser>
             .HasIndex(b => b.CreatedAt);
         // builder.Entity<BudgetList>()
         //     .HasIndex(b => b.OwnerId);
-        builder.Entity<BudgetList>()
-            .HasIndex(b => b.ExpenseId);
+        builder.Entity<Expense>()
+            .HasIndex(b => b.ListId);
 
 
         base.OnModelCreating(builder);

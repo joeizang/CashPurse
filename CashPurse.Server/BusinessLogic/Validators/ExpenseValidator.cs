@@ -24,8 +24,8 @@ public class ExpenseValidator : AbstractValidator<CreateExpenseRequest>
             .NotEqual(decimal.MinValue)
             .NotEqual(decimal.MaxValue)
             .NotEqual(decimal.Zero);
-        RuleFor(e => e.ExpenseOwnerId)
-            .NotEmpty()
-            .WithMessage("Every expense must have an owner.");
+        // RuleFor(e => e.ExpenseOwnerId)
+        //     .NotEmpty()
+        //     .WithMessage("Every expense must have an owner.");
     }
 }

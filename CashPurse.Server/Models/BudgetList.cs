@@ -6,11 +6,7 @@ public class BudgetList : BaseEntity
 
     public string Description { get; set; } = string.Empty;
 
-    public List<BudgetListItem> BudgetItems { get; set; } = new();
-
-    public Guid? ExpenseId { get; set; }
-
-    public Expense? Expense { get; set; }
+    public List<BudgetListItem> BudgetItems { get; set; } = [];
 
     // public required string OwnerId { get; set; } = string.Empty;
     //
