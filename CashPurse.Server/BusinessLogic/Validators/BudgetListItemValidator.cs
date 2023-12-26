@@ -38,7 +38,5 @@ public class UpdateBudgetListItemValidator : AbstractValidator<UpdateBudgetListI
             .GreaterThanOrEqualTo(0m);
         RuleFor(b => b.Quantity)
             .GreaterThanOrEqualTo(1);
-        RuleFor(b => b.Price)
-            .GreaterThanOrEqualTo(0m);
     }
 }

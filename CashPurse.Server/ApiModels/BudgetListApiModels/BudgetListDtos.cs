@@ -7,8 +7,7 @@ public record BudgetListItemModel(Guid ItemId, string Name, double Quantity, dec
     decimal UnitPrice, string Description, DateOnly CreatedAt, Guid? BudgetListId);
 public record CreateBudgetListItemRequest(string ListName, double Quantity, decimal Price,
     decimal UnitPrice, string Description);
-public record UpdateBudgetListItemRequest(Guid ItemId, string Name, double Quantity, decimal Price, 
-    decimal UnitPrice, string Description, Guid BudgetListId);
+public record UpdateBudgetListItemRequest(Guid ItemId, string Name, double Quantity, decimal UnitPrice, string Description, Guid BudgetListId);
 
 public record BudgetListModel(Guid ListId, string Name, string Description, DateOnly CreatedAt,
     IEnumerable<BudgetListItemModel> BudgetItems, List<ExpenseIndexModel> Expenses);

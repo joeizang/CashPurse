@@ -12,8 +12,8 @@ public static class BudgetListApiEndpoints
     {
         var budgetListGroup = app.MapGroup("/api/budgetlists");//.RequireAuthorization();
         var budgetListGroupWithIds = budgetListGroup.MapGroup("/{budgetListId:guid}");
-        // var budgetListItemGroup = budgetListGroupWithIds.MapGroup("/budgetListItem");
-        // var budgetListItemGroupWithIds = budgetListItemGroup.MapGroup("/{budgetListItemId:guid}");
+        var budgetListItemGroup = budgetListGroupWithIds.MapGroup("/budgetlistitems");
+        var budgetListItemGroupWithIds = budgetListItemGroup.MapGroup("/{budgetListItemId:guid}");
 
         // budgetListGroup.MapGet("", async (CashPurseDbContext context) =>
         // {
@@ -44,19 +44,19 @@ public static class BudgetListApiEndpoints
         //     // .AddEndpointFilter<UpdateBudgetListFilter>()
         //     .RequireCors("AllowAll");
         //
-        // budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems)
+        budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems)
         //     // .AddEndpointFilter<FetchBudgetListItemsFilter>()
-        //     .CacheOutput("CacheDataPage")
+            .CacheOutput("CacheDataPage");
         //     .RequireCors("AllowAll");
-        // budgetListItemGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItemById)
+        budgetListItemGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItemById)
         //     // .AddEndpointFilter<GetBudgetListItemByIdFilter>()
-        //     .CacheOutput("CacheDataPage")
+            .CacheOutput("CacheDataPage");
         //     .RequireCors("AllowAll");
-        // budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem)
+        budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem);
         //     // .AddEndpointFilter<CreateBudgetListItemFilter>()
         //     .RequireCors("AllowAll");
         //
-        // budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem)
+        budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem);
         //     // .AddEndpointFilter<UpdateBudgetListItemFilter>()
         //     .RequireCors("AllowAll");
 

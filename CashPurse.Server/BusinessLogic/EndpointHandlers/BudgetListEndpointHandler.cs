@@ -46,14 +46,14 @@ public static class BudgetListEndpointHandler
         return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
     
-    public static async Task<IResult> HandleGetById([FromServices] CashPurseDbContext context, Guid budgetListId)
+    public static IResult HandleGetById([FromServices] CashPurseDbContext context, Guid budgetListId)
     {
         try
         {
-            var result = await BudgetListDataService.BudgetListById(budgetListId, context);
+            var result = BudgetListDataService.BudgetListById(budgetListId, context);
             return TypedResults.Ok(result);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return Results.Problem("There was a problem but the problem ain't yours!");
         }
@@ -86,7 +86,7 @@ public static class BudgetListEndpointHandler
         (inputModel, entity) =>
         {
             entity.ListName = inputModel.ListName;
-            entity.Description = inputModel.Description;
+            entity.Description = inputModel.Description ?? string.Empty;
             return entity;
         };
     private static readonly Func<UpdateBudgetListRequest, CashPurseDbContext, Task<List<BudgetListItem>>> 
@@ -143,10 +143,17 @@ public static class BudgetListEndpointHandler
         return TypedResults.Created();
     }
     
-    public static async Task<NoContent> UpdateBudgetListItem([FromServices] CashPurseDbContext context, Guid budgetListId,
+    public static async Task<IResult> UpdateBudgetListItem([FromServices] CashPurseDbContext context, Guid budgetListId,
         Guid budgetListItemId, [FromBody] UpdateBudgetListItemRequest inputModel)
     {
-        await BudgetListDataService.UpdateBudgetListItem(context, inputModel).ConfigureAwait(false);
-        return TypedResults.NoContent();
+        try
+        {
+            await BudgetListDataService.UpdateBudgetListItem(context, inputModel).ConfigureAwait(false);
+            return TypedResults.NoContent();
+        }
+        catch (Exception)
+        {
+            return Results.Problem("There was a problem but the problem ain't yours!");
+        }
     }
 }

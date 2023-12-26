@@ -1,12 +1,10 @@
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
-using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.BusinessLogic.Exceptions;
 using CashPurse.Server.CompiledEFQueries;
 using CashPurse.Server.Data;
 using CashPurse.Server.Models;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace CashPurse.Server.BusinessLogic.DataServices;
 
@@ -17,46 +15,43 @@ public static class BudgetListDataService
         string ownerExpenseId, DateOnly cursor)
     {
         var results = new List<BudgetListModel>();
-
         await foreach (var budgetList in CompiledQueries.GetCursorPagedUserBudgetLists(context,
                            cursor, ownerExpenseId))
         {
             results.Add(budgetList);
         }
-
         return new CursorPagedResult<List<BudgetListModel>>(results[^1].CreatedAt, results);
     }
     
     public static async Task<PagedResult<BudgetListModel>> UserBudgetLists(CashPurseDbContext context)
     {
-        // var results = new List<BudgetListModel>();
+        var results = new List<BudgetListModel>();
 
-        // await foreach (var budgetList in CompiledQueries.GetUserBudgetLists(_context, ownerId))
-        // {
-        //     results.Add(budgetList);
-        // }
-        var results = await context.BudgetLists.AsNoTracking()
-                .OrderBy(b => b.CreatedAt)
-                // .Where(b => b.OwnerId == ownerId)
-                .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description, b.CreatedAt,
-                    b.BudgetItems.Select(x => new BudgetListItemModel(
-                        x.Id, x.Description, x.Quantity, x.Price, x.UnitPrice,
-                        x.Description, x.CreatedAt, b.Id)), new List<ExpenseIndexModel>()))
-                .Take(7).ToListAsync(CancellationToken.None).ConfigureAwait(false);
+        await foreach (var budgetList in CompiledQueries.GetUserBudgetLists(context, string.Empty))
+        {
+            results.Add(budgetList);
+        }
 
         return new PagedResult<BudgetListModel>(results, results.Count, 
             1, 7, 
             (int)Math.Ceiling(results.Count / (double)7), 1,
             7 < (int)Math.Ceiling(results.Count / (double)7));
     }
-    
-    public static async Task<BudgetListModel> BudgetListById(Guid id, CashPurseDbContext context)
+
+    public static BudgetListModel BudgetListById(Guid id, CashPurseDbContext context)
     {
-        var budgetResult = CompiledQueries.GetBudgetListById(context, id) ?? 
-                     throw new BudgetListOrItemNotFound("Budget list not found.");
-        var expenseQuery = CompiledQueries.GetExpenseByBudgetId(context, id);
-        budgetResult!.Expenses.AddRange(expenseQuery);
-        return budgetResult;
+        try
+        {
+            var budgetResult = CompiledQueries.GetBudgetListById(context, id) ??
+                         throw new BudgetListOrItemNotFound("Budget list not found.");
+            var expenseQuery = CompiledQueries.GetExpenseByBudgetId(context, id);
+            budgetResult!.Expenses.AddRange(expenseQuery);
+            return budgetResult;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public static int CountBudgetListItems(CashPurseDbContext context, Guid id)
@@ -127,30 +122,67 @@ public static class BudgetListDataService
 
     public static async Task DeleteBudgetList(CashPurseDbContext context, BudgetList entity)
     {
-        context.Entry(entity).State = EntityState.Modified;
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        await context.Database.BeginTransactionAsync().ConfigureAwait(false);
+        try
+        {
+            context.Entry(entity).State = EntityState.Modified;
+            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync().ConfigureAwait(false);
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            await context.Database.RollbackTransactionAsync().ConfigureAwait(false);
+            var retryCounter = 0;
+
+            while(retryCounter < 5)
+            {
+                e.Entries.Single(x => x.Entity == entity).Reload();
+                await Task.Delay(2000);
+                retryCounter++;
+            }
+            throw;
+        }
     }
 
     public static async Task AddNewBudgetListItem(CashPurseDbContext context, BudgetListItem entity)
     {
-        entity.CalculateItemPrice();
-        context.BudgetListItems.Add(entity);
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        await context.Database.BeginTransactionAsync().ConfigureAwait(false);
+        try
+        {
+            entity.CalculateItemPrice();
+            context.BudgetListItems.Add(entity);
+            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync().ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            await context.Database.RollbackTransactionAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
     public static async Task UpdateBudgetListItem(CashPurseDbContext context, UpdateBudgetListItemRequest model)
     {
-        var target = await context.BudgetListItems.FindAsync(model.ItemId).ConfigureAwait(false);
-        if(target is null) throw new BudgetListOrItemNotFound("Item not found.");
-        target.Name = model.Name;
-        target.Description = model.Description;
-        target.UnitPrice = model.UnitPrice;
-        target.Quantity = model.Quantity;
-        target.CalculateItemPrice();
-        target.UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
-        
-        context.Entry(target).State = EntityState.Modified;
-        await context.SaveChangesAsync().ConfigureAwait(false); 
+        await context.Database.BeginTransactionAsync().ConfigureAwait(false);
+        try
+        {
+            var target = await context.BudgetListItems.FindAsync(model.ItemId).ConfigureAwait(false) ?? throw new BudgetListOrItemNotFound("Item not found.");
+            target.Name = model.Name;
+            target.Description = model.Description;
+            target.UnitPrice = model.UnitPrice;
+            target.Quantity = model.Quantity;
+            target.CalculateItemPrice();
+            target.UpdatedAt = DateOnly.FromDateTime(DateTime.Today);
+            
+            context.Entry(target).State = EntityState.Modified;
+            await context.SaveChangesAsync().ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync().ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            await context.Database.RollbackTransactionAsync().ConfigureAwait(false);
+            throw;
+        }
     }
     
     public static async Task<PagedResult<BudgetListItemModel>> BudgetListItems(

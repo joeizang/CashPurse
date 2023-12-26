@@ -17,7 +17,7 @@ public static class ExpenseApiEndpoints
             // .AllowAnonymous()
             // .CacheOutput("CacheDataPage")
             // .RequireCors("AllowAll");
-        expenseGroup.MapGet("/cursor-paged", ExpenseEndpointHandler.HandleCursorPagedGet).RequireCors("AllowAll");;
+        expenseGroup.MapGet("/cursor-paged", ExpenseEndpointHandler.HandleCursorPagedGet).RequireCors("AllowAll");
         expenseGroup.MapGet("/bycurrency", ExpenseEndpointHandler.HandleGetExpensesByCurrency)
             .CacheOutput("CacheDataPage")
             // .AddEndpointFilter<ExpenseGetFilter>()
