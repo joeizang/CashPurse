@@ -11,6 +11,8 @@ public class Expense : BaseEntity
 
     public decimal Amount { get; set; }
 
+    public double Quantity { get; set; }
+
     public required Currency CurrencyUsed { get; set; }
 
     public string? ReceiptUrl { get; set; } = string.Empty;
