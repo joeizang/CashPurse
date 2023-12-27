@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CashPurse.Server;
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
@@ -12,6 +14,7 @@ using CashPurse.Server.SwaggerConfig;
 using dotenv.net;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -30,6 +33,12 @@ builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 builder.Services.AddOutputCache(options => {
     options.AddBasePolicy(b => b.Expire(TimeSpan.FromSeconds(12)));
     options.AddPolicy("CacheDataPage", b => b.Expire(TimeSpan.FromSeconds(30)));
+});
+
+builder.Services.Configure<JsonOptions>(opt => 
+{
+    opt.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddCors(options =>
