@@ -35,13 +35,11 @@ public static class BudgetListEndpointHandler
         return TypedResults.Ok(alternative?.Items.Count == 0 ? alternative : alternative!);
     }
     
-    public static async Task<Ok<CursorPagedResult<List<BudgetListModel>>>> HandleCursorPagedGet(
+    public static async Task<IResult> HandleCursorPagedGet(
         [FromServices] CashPurseDbContext context, DateOnly cursor)
     {
-        var user = new ApplicationUser();
-        var expense = context.Expenses.AsNoTracking();//.First(x => x.ExpenseOwnerId == user!.Id);
         var alternative = await BudgetListDataService
-            .CursorPagedUserBudgetLists(context, user!.Id, cursor)
+            .CursorPagedUserBudgetLists(context, string.Empty, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(alternative?.Data.Count == 0 ? alternative : alternative!);
     }
