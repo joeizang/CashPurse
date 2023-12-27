@@ -56,9 +56,9 @@ public static class ExpenseEndpointHandler
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> 
         HandleGetCursorPagedExpensesByCurrency([FromServices] CashPurseDbContext context, DateOnly cursor)
     {
-        var user = new ApplicationUser();
+        // var user = new ApplicationUser();
         var result = await ExpenseDataService
-            .CurrencyUsedCursorPagedFilteredExpenses(context, user?.Id!, cursor)
+            .CurrencyUsedCursorPagedFilteredExpenses(context, string.Empty, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
@@ -66,8 +66,8 @@ public static class ExpenseEndpointHandler
     internal static async Task<Ok<PagedResult<ExpenseIndexModel>>> 
         HandleGetExpensesByCurrency(ClaimsPrincipal principal, [FromServices] CashPurseDbContext context)
     {
-        var user = new ApplicationUser();
-        var result = await ExpenseDataService.CurrencyUsedFilteredExpenses(context, user?.Id!, 1)
+        // var user = new ApplicationUser();
+        var result = await ExpenseDataService.CurrencyUsedFilteredExpenses(context, string.Empty, 1)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
@@ -75,8 +75,8 @@ public static class ExpenseEndpointHandler
     internal static async Task<Ok<CursorPagedResult<IEnumerable<ExpenseIndexModel>>>> HandleGetExpenseByExpenseType(
         [FromServices] CashPurseDbContext context, CursorPagedRequest cursor)
     {
-        var user = new ApplicationUser();
-        var result = await ExpenseDataService.CursorPagedTypeFilteredExpenses(context, user?.Id!, cursor)
+        // var user = new ApplicationUser();
+        var result = await ExpenseDataService.CursorPagedTypeFilteredExpenses(context, string.Empty, cursor)
             .ConfigureAwait(false);
         return TypedResults.Ok(result);
     }
@@ -108,9 +108,10 @@ public static class ExpenseEndpointHandler
         return TypedResults.Created();
     }
 
-    private static Func<Guid, CashPurseDbContext, Task<Expense?>> FetchExpenseById = async (id, context) => 
+    private static readonly Func<Guid, CashPurseDbContext, Task<Expense?>> 
+    FetchExpenseById = async (id, context) => 
         await context.Expenses.FindAsync(id).ConfigureAwait(false);
-    internal static async Task<NoContent> HandleUpdateExpense( 
+    internal static async Task<IResult> HandleUpdateExpense( 
         [FromServices] CashPurseDbContext context, [FromBody] UpdateExpenseRequest request,
         [FromRoute] Guid expenseId, CancellationToken token = default)
     {

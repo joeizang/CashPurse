@@ -13,10 +13,10 @@ public static class ExpenseApiEndpoints
         var expenseGroup = app.MapGroup("/api/expenses");//.RequireAuthorization();
         var expenseGroupWithIds = expenseGroup.MapGroup("/{expenseId:guid}");
 
-        expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet);
+        expenseGroup.MapGet("", ExpenseEndpointHandler.HandleGet)
             // .AllowAnonymous()
-            // .CacheOutput("CacheDataPage")
-            // .RequireCors("AllowAll");
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         expenseGroup.MapGet("/cursor-paged", ExpenseEndpointHandler.HandleCursorPagedGet).RequireCors("AllowAll");
         expenseGroup.MapGet("/bycurrency", ExpenseEndpointHandler.HandleGetExpensesByCurrency)
             .CacheOutput("CacheDataPage")
