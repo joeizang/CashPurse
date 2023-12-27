@@ -14,6 +14,14 @@ public class BudgetListItem : BaseEntity
     
     public Guid BudgetListId { get; set; }
 
+    public bool ConvertedToExpense { get; private set; }
+
+    public void UpdateBudgetListItemStatus(Guid expenseId)
+    {
+        if(expenseId == Guid.Empty) return;
+        ConvertedToExpense = true;
+    }
+
     public void CalculateItemPrice()
     {
         Price = UnitPrice * (decimal)Quantity;

@@ -6,7 +6,7 @@ public class BudgetList : BaseEntity
 
     public string Description { get; set; } = string.Empty;
 
-    public bool CloseList { get; set; }
+    public bool CloseList { get; private set; }
 
     public List<BudgetListItem> BudgetItems { get; set; } = [];
 
@@ -28,5 +28,11 @@ public class BudgetList : BaseEntity
             ListId = budgetListItem.BudgetListId
         };
         return expense;
+    }
+
+    public void CloseBudgetList()
+    {
+        if(!BudgetItems.TrueForAll(item => item.ConvertedToExpense == true))return;
+        CloseList = true;
     }
 }
