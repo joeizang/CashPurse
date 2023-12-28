@@ -9,3 +9,4 @@ public record PagedResult<T>(List<T> Items, int TotalCount, int CurrentPage,
     bool HasNextPage = false, bool HasPreviousPage = false,
     FilterCriteria CurrentFilter = FilterCriteria.ByDate,
     DateOnly? Cursor = null);
+public record ErrorResult(string Message, int ErrorCode, string? InnerErrorMessage = null);
