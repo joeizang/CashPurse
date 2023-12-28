@@ -110,7 +110,8 @@ public static class BudgetListEndpointHandler
         {
             var budgetList = await FetchBudgetListById(budgetListId, context).ConfigureAwait(false);
             if (budgetList is null) return Results.NotFound("Budget list not found.");
-            budgetList.CloseBudgetList();
+            var reuslt = budgetList.CloseBudgetList();
+            if (reuslt.Item2 == false) return Results.BadRequest(reuslt.Item1);
             await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
             return TypedResults.NoContent();
         }
@@ -166,9 +167,36 @@ public static class BudgetListEndpointHandler
         }
     }
 
-    internal static Task MapAndCreateExpenseFromBudgetListItem([FromServices] CashPurseDbContext context,
-        Guid budgetListId, Guid budgetListItemId, [FromBody] StrikeItemOffCurrentListRequest inputModel)
+    internal static async Task<IResult> 
+    MapAndCreateExpenseFromBudgetListItem([FromServices]CashPurseDbContext context, Guid budgetListId, Guid budgetListItemId, [FromBody] StrikeItemOffCurrentListRequest inputModel,
+        CancellationToken token)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var budgetList = await context.BudgetLists
+                .Include(b => b.BudgetItems)
+                .Where(b => b.Id == budgetListId)
+                .Where(b => b.BudgetItems.TrueForAll(x => x.Id == budgetListItemId))
+                .FirstOrDefaultAsync(cancellationToken: token);
+            var budgetListItem = budgetList?.BudgetItems.Single(x => x.Id == budgetListItemId);
+            if (budgetList is null) return Results.BadRequest("Budget list or item not found.");
+            // defaults to Nigerian Naira and other expense type.
+            var expense = budgetList.MapBudgetListItemsToExpenses(ExpenseType.Other, Currency.NGN,
+                budgetListItem!);
+            //start transaction. Guard against failure. If there are failures, rollback everything.
+            await context.Database.BeginTransactionAsync(token).ConfigureAwait(false);
+            context.Expenses.Add(expense);
+            await context.SaveChangesAsync(token).ConfigureAwait(false);
+            budgetListItem?.UpdateBudgetListItemStatus(budgetListId);
+            context.Entry(budgetListItem!).State = EntityState.Modified;
+            await context.SaveChangesAsync(token).ConfigureAwait(false);
+            await context.Database.CommitTransactionAsync(token).ConfigureAwait(false);
+            return Results.Ok(new { expenseCreated = true, budgetListItemUpdated = true });
+        }
+        catch (Exception e)
+        {
+            await context.Database.RollbackTransactionAsync(token).ConfigureAwait(false);
+            throw;
+        }
     }
 }
