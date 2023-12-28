@@ -34,7 +34,7 @@ public class BudgetList : BaseEntity
 
     public (ErrorResult, bool) CloseBudgetList()
     {
-        if(!BudgetItems.TrueForAll(item => item.ConvertedToExpense == true))
+        if(BudgetItems.Count > 0 && !BudgetItems.TrueForAll(item => item.ConvertedToExpense == true))
             return (new ErrorResult("All items must be converted to expenses before closing the list", 400), false);
         CloseList = true;
         return (null!, true);
