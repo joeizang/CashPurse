@@ -1,4 +1,6 @@
-﻿namespace CashPurse.Server.Models;
+﻿using CashPurse.Server.ApiModels;
+
+namespace CashPurse.Server.Models;
 
 public class BudgetList : BaseEntity
 {
@@ -30,9 +32,11 @@ public class BudgetList : BaseEntity
         return expense;
     }
 
-    public void CloseBudgetList()
+    public (ErrorResult, bool) CloseBudgetList()
     {
-        if(!BudgetItems.TrueForAll(item => item.ConvertedToExpense == true))return;
+        if(!BudgetItems.TrueForAll(item => item.ConvertedToExpense == true))
+            return (new ErrorResult("All items must be converted to expenses before closing the list", 400), false);
         CloseList = true;
+        return (null!, true);
     }
 }
