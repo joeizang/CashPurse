@@ -35,23 +35,17 @@ public static class BudgetListDataService
         return new PagedResult<BudgetListModel>(results, results.Count, 
             1, 7, 
             (int)Math.Ceiling(results.Count / (double)7), 1,
-            7 < (int)Math.Ceiling(results.Count / (double)7));
+            7 < (int)Math.Ceiling(results.Count / (double)7),
+            false, FilterCriteria.ByDate, results[^1].CreatedAt);
     }
 
     public static BudgetListModel BudgetListById(Guid id, CashPurseDbContext context)
     {
-        try
-        {
-            var budgetResult = CompiledQueries.GetBudgetListById(context, id) ??
-                         throw new BudgetListOrItemNotFound("Budget list not found.");
-            var expenseQuery = CompiledQueries.GetExpenseByBudgetId(context, id);
-            budgetResult!.Expenses.AddRange(expenseQuery);
-            return budgetResult;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        var budgetResult = CompiledQueries.GetBudgetListById(context, id);
+        if(budgetResult is null) return null!;
+        var expenseQuery = CompiledQueries.GetExpenseByBudgetId(context, id);
+        budgetResult!.Expenses.AddRange(expenseQuery);
+        return budgetResult;
     }
 
     public static int CountBudgetListItems(CashPurseDbContext context, Guid id)
@@ -198,7 +192,8 @@ public static class BudgetListDataService
         return new PagedResult<BudgetListItemModel>(results, results.Count, 
             1, 7, 
             (int)Math.Ceiling(results.Count / (double)7), 1,
-            7 < (int)Math.Ceiling(results.Count / (double)7));
+            7 < (int)Math.Ceiling(results.Count / (double)7),
+            false, FilterCriteria.ByDate, results[^1].CreatedAt);
     }
     
     public static async Task<CursorPagedResult<List<BudgetListItemModel>>> CursorPagedBudgetListItems(
