@@ -3,6 +3,7 @@ using System.Security.Principal;
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
 using CashPurse.Server.BusinessLogic.DataServices;
+using CashPurse.Server.BusinessLogic.Exceptions;
 using CashPurse.Server.Data;
 using CashPurse.Server.MapperConfiguration;
 using CashPurse.Server.Models;
@@ -26,10 +27,6 @@ public static class BudgetListEndpointHandler
 
     public static async Task<Ok<PagedResult<BudgetListModel>>> HandleGet([FromServices] CashPurseDbContext context)
     {
-        var user = new ApplicationUser();
-        var expense = await context.Expenses.AsNoTracking()
-            // .Where(x => x.ExpenseOwnerId == user!.Id)
-            .ToArrayAsync(CancellationToken.None);
         var alternative = await BudgetListDataService.UserBudgetLists(context)
             .ConfigureAwait(false);
         return TypedResults.Ok(alternative?.Items.Count == 0 ? alternative : alternative!);
@@ -49,11 +46,11 @@ public static class BudgetListEndpointHandler
         try
         {
             var result = BudgetListDataService.BudgetListById(budgetListId, context);
-            return TypedResults.Ok(result);
+            return result is not null ? TypedResults.Ok(result) : Results.NotFound("Budget list not found.");
         }
-        catch (Exception)
+        catch(Exception b)
         {
-            return Results.Problem("There was a problem but the problem ain't yours!");
+            return Results.NotFound("Budget list not found.");
         }
     }
 
@@ -63,8 +60,6 @@ public static class BudgetListEndpointHandler
         try
         {
             var budgetList = BudgetListMapper.MapCreateBudgetList(inputModel);
-            // var user = new ApplicationUser();
-            // budgetList.OwnerId = inputModel.BudgetListOwnerId;
             await BudgetListDataService.AddNewBudgetList(context, budgetList).ConfigureAwait(false);
             return Results.Created($"budgetlists/{budgetList.Id}", budgetList);
         }
@@ -107,6 +102,23 @@ public static class BudgetListEndpointHandler
         await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
         return TypedResults.NoContent();
     }
+
+    public static async Task<IResult> CloseBudgetList(
+        [FromServices] CashPurseDbContext context, Guid budgetListId)
+    {
+        try
+        {
+            var budgetList = await FetchBudgetListById(budgetListId, context).ConfigureAwait(false);
+            if (budgetList is null) return Results.NotFound("Budget list not found.");
+            budgetList.CloseBudgetList();
+            await BudgetListDataService.UpdateBudgetList(context, budgetList).ConfigureAwait(false);
+            return TypedResults.NoContent();
+        }
+        catch (Exception e)
+        {
+            return Results.Problem("There was a problem but the problem ain't yours!");
+        }
+    }
     
     public static async Task<PagedResult<BudgetListItemModel>> HandleGetBudgetListItems(
         [FromServices] CashPurseDbContext context, Guid budgetListId)
@@ -141,8 +153,7 @@ public static class BudgetListEndpointHandler
         return TypedResults.Created();
     }
     
-    public static async Task<IResult> UpdateBudgetListItem([FromServices] CashPurseDbContext context, Guid budgetListId,
-        Guid budgetListItemId, [FromBody] UpdateBudgetListItemRequest inputModel)
+    public static async Task<IResult> UpdateBudgetListItem([FromServices] CashPurseDbContext context, Guid budgetListId, Guid budgetListItemId, [FromBody] UpdateBudgetListItemRequest inputModel)
     {
         try
         {
@@ -153,5 +164,11 @@ public static class BudgetListEndpointHandler
         {
             return Results.Problem("There was a problem but the problem ain't yours!");
         }
+    }
+
+    internal static Task MapAndCreateExpenseFromBudgetListItem([FromServices] CashPurseDbContext context,
+        Guid budgetListId, Guid budgetListItemId, [FromBody] StrikeItemOffCurrentListRequest inputModel)
+    {
+        throw new NotImplementedException();
     }
 }

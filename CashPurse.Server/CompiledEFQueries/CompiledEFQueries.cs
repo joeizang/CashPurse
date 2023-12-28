@@ -181,6 +181,7 @@ namespace CashPurse.Server.CompiledEFQueries
                     (CashPurseDbContext context, string userId) =>
                         context.BudgetLists.AsNoTracking()
                             .OrderByDescending(b => b.CreatedAt)
+                            .OrderBy(b => b.CloseList)
                             // .Where(b => b.OwnerId == userId)
                             .Select(b => new BudgetListModel(b.Id, b.ListName, b.Description, b.CreatedAt,
                                 b.BudgetItems.Select(x => new BudgetListItemModel(

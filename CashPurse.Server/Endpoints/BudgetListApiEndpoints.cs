@@ -17,45 +17,39 @@ public static class BudgetListApiEndpoints
 
         //==> QUERIES
         budgetListGroup.MapGet("", BudgetListEndpointHandler.HandleGet)
-            .CacheOutput("CacheDataPage");
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         budgetListGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetById)
-            .CacheOutput("CacheDataPage");
+            .AddEndpointFilter<GetBudgetListByIdFilter>()
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         budgetListGroup.MapGet("/paged", BudgetListEndpointHandler.HandleCursorPagedGet)
-            .CacheOutput("CacheDataPage");
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         //==> COMMANDS
         budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList);
         budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList);
-        //     .RequireCors("AllowAll");
-        //
+        budgetListGroupWithIds.MapPut("/closeList", BudgetListEndpointHandler.CloseBudgetList);
         
-        //     // .AddEndpointFilter<GetBudgetListByIdFilter>()
-        //     .RequireCors("AllowAll");
-        //
-        //     // .AddEndpointFilter<CreateBudgetListFilter>()
-        //     .RequireCors("AllowAll");
-        //
-        //     // .AddEndpointFilter<UpdateBudgetListFilter>()
-        //     .RequireCors("AllowAll");
-        //
         // ==> BUDGETLISTITEMS QUERIES
         budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems)
-            .CacheOutput("CacheDataPage");
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         budgetListItemGroupWithIds.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItemById)
-            .CacheOutput("CacheDataPage");
-        //     // .AddEndpointFilter<FetchBudgetListItemsFilter>()
-        //     .RequireCors("AllowAll");
-        //     // .AddEndpointFilter<GetBudgetListItemByIdFilter>()
-        //     .RequireCors("AllowAll");
+            .AddEndpointFilter<GetBudgetListItemByIdFilter>()
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
 
         // ==> BUDGETLISTITEMS COMMANDS
-        budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem);
-        budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem);
-        //     // .AddEndpointFilter<CreateBudgetListItemFilter>()
-        //     .RequireCors("AllowAll");
-        //
-        //     // .AddEndpointFilter<UpdateBudgetListItemFilter>()
-        //     .RequireCors("AllowAll");
-
+        budgetListItemGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetListItem)
+            .AddEndpointFilter<CreateBudgetListItemFilter>()
+            .RequireCors("AllowAll");
+        budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem)
+            .AddEndpointFilter<UpdateBudgetListItemFilter>()
+            .RequireCors("AllowAll");
+        budgetListItemGroupWithIds.MapPut("/strikeitemoffcurrentlist", BudgetListEndpointHandler.MapAndCreateExpenseFromBudgetListItem)
+            // .AddEndpointFilter<StrikeItemOffCurrentListFilter>()
+            .RequireCors("AllowAll");
         return budgetListGroup;
     }
 }
