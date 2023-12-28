@@ -47,7 +47,7 @@ public static class BudgetListApiEndpoints
         budgetListItemGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetListItem)
             .AddEndpointFilter<UpdateBudgetListItemFilter>()
             .RequireCors("AllowAll");
-        budgetListItemGroupWithIds.MapPut("/strikeitemoffcurrentlist", BudgetListEndpointHandler.MapAndCreateExpenseFromBudgetListItem)
+        budgetListItemGroupWithIds.MapPut("/strikeitemoff", BudgetListEndpointHandler.MapAndCreateExpenseFromBudgetListItem)
             // .AddEndpointFilter<StrikeItemOffCurrentListFilter>()
             .RequireCors("AllowAll");
         return budgetListGroup;
