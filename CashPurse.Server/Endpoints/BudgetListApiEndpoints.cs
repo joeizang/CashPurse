@@ -27,9 +27,15 @@ public static class BudgetListApiEndpoints
             .CacheOutput("CacheDataPage")
             .RequireCors("AllowAll");
         //==> COMMANDS
-        budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList);
-        budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList);
-        budgetListGroupWithIds.MapPut("/closeList", BudgetListEndpointHandler.CloseBudgetList);
+        budgetListGroup.MapPost("", BudgetListEndpointHandler.CreateBudgetList)
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
+        budgetListGroupWithIds.MapPut("", BudgetListEndpointHandler.UpdateBudgetList)
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
+        budgetListGroupWithIds.MapPut("/closeList", BudgetListEndpointHandler.CloseBudgetList)
+            .CacheOutput("CacheDataPage")
+            .RequireCors("AllowAll");
         
         // ==> BUDGETLISTITEMS QUERIES
         budgetListItemGroup.MapGet("", BudgetListEndpointHandler.HandleGetBudgetListItems)
