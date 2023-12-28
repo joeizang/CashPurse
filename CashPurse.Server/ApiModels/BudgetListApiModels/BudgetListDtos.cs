@@ -19,3 +19,6 @@ public record CreateBudgetListRequest(string Name, string Description);
 
 public record UpdateBudgetListRequest(string ListName, string? Description, string? ExpenseId,
     IEnumerable<BudgetListItemModel> BudgetItems, Guid BudgetListId, string? BudgetListOwnerId);
+
+public record StrikeItemOffCurrentListRequest(Guid BudgetListItemId, Guid BudgetListId, string Name,
+    double Quantity, decimal Price, decimal UnitPrice, string Description, DateOnly CreatedAt);
