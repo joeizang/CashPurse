@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using CashPurse.Server;
 using CashPurse.Server.ApiModels;
 using CashPurse.Server.ApiModels.BudgetListApiModels;
+using CashPurse.Server.ApiModels.ExpensesApiModels;
 using CashPurse.Server.BusinessLogic.DataServices;
 using CashPurse.Server.BusinessLogic.Validators;
 using CashPurse.Server.Data;
@@ -14,11 +15,12 @@ using CashPurse.Server.SwaggerConfig;
 using dotenv.net;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 DotEnv.Load();
 
@@ -27,7 +29,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContextPool<CashPurseDbContext>(options =>
 {
-    // options.UseSqlite("Data Source=../../appdb1.sqlite");
     options.UseNpgsql(Environment.GetEnvironmentVariable("postgresconnectionstring")!);
 });
 builder.Services.AddOutputCache(options => {
@@ -40,6 +41,8 @@ builder.Services.Configure<JsonOptions>(opt =>
     opt.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     opt.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -78,12 +81,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 // app.MapGroup("/auth").MapIdentityApi<ApplicationUser>();
-app.MapGet("/api/health", () => Results.Ok("Healthy! :D"));
-
-app.MapGet("/api/budgetListings", async (CashPurseDbContext context) =>
+app.MapGet("/api/health", async ([FromServices] CashPurseDbContext context,
+    IHttpClientFactory factory) =>
 {
-    var result = await BudgetListDataService.UserBudgetLists(context).ConfigureAwait(false);
-    return Results.Ok(result);
+    var client = factory.CreateClient();
+    client.BaseAddress = new Uri("http://localhost:5086");
+    var budgetListsChecked = await context.BudgetLists.AsNoTracking().AnyAsync().ConfigureAwait(false);
+    var test = await context.Expenses.AsNoTracking().AnyAsync().ConfigureAwait(false);
+    var test1 = await client
+        .GetAsync("/api/budgetlists")
+        .ConfigureAwait(false);
+    var test2 = await client
+        .GetAsync("/api/expenses")
+        .ConfigureAwait(false);
+    if (budgetListsChecked && test && test1.IsSuccessStatusCode && test2.IsSuccessStatusCode)
+        return Results.Ok("API is up and running!");
+    return Results.Problem("API is up and running but there is a problem with the data!");
 });
 
 app.MapExpenseEndpoints();
