@@ -365,6 +365,7 @@ FodyWeavers.xsd
 .idea/.idea.CashPurse/.idea/indexLayout.xml
 .idea/.idea.CashPurse/.idea/vcs.xml
 .idea/.idea.CashPurse/.idea/dataSources.xml
+.idea/**/*.*
 .vscode/settings.json
 
 # db related stuff
